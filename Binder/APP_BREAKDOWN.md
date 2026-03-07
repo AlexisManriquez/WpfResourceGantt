@@ -77,7 +77,7 @@ Located immediately below the Navigation Ribbon, this toolbar updates dynamicall
 *   **USERS Context**:
     *   **Users Group**: Add User, Edit User, Delete User.
 *   **GLOBAL Context (DATA TOOLS)**:
-    *   **Data Group**: MPP Import/Export, Import Hours, Export Excel.
+    *   **Data Group**: MPP Import/Export, Import Hours, Export Excel, RECONST PROJECT.
     *   **Sync**: Global Refresh button.
 
 ---
@@ -95,6 +95,7 @@ Located immediately below the Navigation Ribbon, this toolbar updates dynamicall
 | **Developer Portal** | `DeveloperPortalViewModel.cs` | **Role-Specific**. A simplified dashboard for Developers to see only their assigned Tasks and Quick Tasks. |
 | **Analytics** | `AnalyticsViewModel.cs` | Visualizes Project Health using `LiveCharts`. |
 | **Assign Developer** | `AssignDeveloperViewModel.cs` | **Dialog View**. Allows a Manager to assign a Developer to a specific Task/Leaf item. |
+| **Reconstruct Project**| `ReconstructProjectDialogViewModel.cs`| **Dialog View**. High-speed pipeline for rebuilding DoD hierarchies from SMTS exports. |
 | **Dialogs** | `ExportSystemDialogViewModel.cs`, `ImportBlocksViewModel.cs` | **Utility Module**. Contains shared dialogs for system export and block imports. |
 
 ---
@@ -243,6 +244,15 @@ This module handles the complex logic of creating and editing hierarchical Work 
         *   Dynamic UI logic (hiding "Number" fields for lower-level tasks).
     *   **`CreateProjectViewModel.cs`**: A specialized wrapper often used for the top-level "Add Project" flow.
     *   **`CreateSubProjectViewModel.cs`** & **`CreateTaskViewModel.cs`**: Helper classes for specific levels, though `CreateWorkItemViewModel` is the primary recursive driver.
+
+#### 2. Reconstruct Project (Folder: `ProjectManagement/Features/Dialogs`)
+This module provides a specialized end-to-end pipeline to reconstruct a full DoD project hierarchy from a raw SMTS CSV/Excel export.
+*   **Purpose**: Rapidly build System/Project/SubProject/Task trees from external data ensuring historical metric preservation.
+*   **Key Files**:
+    *   **`ReconstructProjectDialogViewModel.cs`**: Orchestrates the reconstruction flow.
+        *   **Auto-Scanner**: Uses `ScanCsvForNumbers` to pre-fill System/Project numbers from the source file.
+        *   **Excel Support**: Leverages background COM Interop (`ConvertExcelToCsv`) to handle `.xlsx` workbooks.
+    *   **`CsvImportService.cs`**: The parsing engine (heavily upgraded for hierarchy generation).
 
 
 

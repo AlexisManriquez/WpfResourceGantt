@@ -22,6 +22,7 @@ purpose: AI reference for the System Management CRUD view.
 | Delete item | `DeleteCommand` |
 | Copy / Paste | `HandleCopy`, `HandlePaste`, `ExecutePaste` |
 | Expansion state preservation | `RefreshData`, `OnDataChanged` |
+| Schedule Mode Toggle | Dropdown toggle for **Dynamic** vs **Manual** mode directly in the Name column |
 | EVM Mode Awareness | `IsEvmHoursBased` / `EvmDisplayMode` |
 
 ## SystemHierarchyItemViewModel
@@ -38,6 +39,7 @@ Wrapper ViewModel for each tree row with:
 | `TotalFloat` | Days of slack, shown in the "Slack" column |
 | `IsCritical` | `true` when `TotalFloat == 0` (red text in UI) |
 | `DurationDays` | Business-day duration |
+| `ScheduleMode` | **Manual** (user-driven) or **Dynamic** (engine-driven). Manual mode respects user date entries and updates `DurationDays`. |
 
 ### Predecessor Display
 The Predecessors column uses a **dual-binding** pattern:
@@ -61,7 +63,7 @@ Key columns in `SystemManagementView.xaml`:
 | Duration | 60 | DurCol |
 
 ## Contextual Toolbar (shown when `CurrentView = "Systems"`)
-- Add System, Add Item, Apply Template, Gate Progress, Delete Item
+- Add System, Add Item, Apply Template, Gate Progress, Delete Item, **RECONST PROJECT**
 
 ## Related Pages
 - [[ProjectData & SystemItem]] — SystemItem model

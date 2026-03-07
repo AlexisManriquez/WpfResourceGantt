@@ -7,7 +7,7 @@ purpose: AI reference for the CSV hours import pipeline. The ONLY authorized wri
 
 **File**: `ProjectManagement/CsvImportService.cs`
 
-Handles importing actual work hours from SMTS CSV files. This is the **sole authorized writer** of `WorkBreakdownItem.Acwp` in the entire application.
+Handles importing actual work hours from SMTS CSV files and provides the **"Reconstruct Project"** pipeline for rebuilding full WBS hierarchies from external exports.
 
 ## DoD Compliance Rule
 
@@ -64,6 +64,24 @@ Added to `WorkBreakdownItem` in Phase 2 refactor:
 - After import, `CPI` and `CV` change: `CPI = BCWP / ACWP`
 - ACWP rollup to summary nodes is handled by `EvmCalculationService` on next load
 - PMs should run **Close Week** after each weekly SMTS import to capture a snapshot
+
+---
+
+# Project Reconstruction Pipeline
+A high-speed engine that parses raw exports to rebuild complex DoD hierarchies.
+
+## Features
+*   **Dynamic Column Indexing**: No longer relies on hardcoded indices. Automatically finds *Task Heading* (last column) and *Task Name* (second-to-last column).
+*   **Excel Support**: Direct selection of `.xlsx` files via background COM Interop conversion (`ConvertExcelToCsv`).
+*   **Blank Row Resilience**: Filters out trailing empty rows (`,,,,,,,`) to prevent phantom subprojects.
+*   **Intelligent String Parsing**:
+    *   **SubProjects**: Regex extraction for 4-digit codes (e.g., `0055`) from raw strings.
+    *   **Leaf Tasks**: Automatically strips leading numeric sequence codes (e.g., `6.3.4.1`) for clean naming.
+*   **Safe WBS Generation**: Uses `Max(WbsValue) + 1` for new containers, preventing overlap bugs even if items were deleted.
+
+## Data Logic
+- **Initialization Order**: `Level` property is assigned **before** `Name` during hierarchical mapping to prevent truncation issues and ensure correct parent-child association.
+- **Hierarchy Mapping**: Reconstructs System → Project → SubProject → Leaf Task levels with depth awareness.
 
 ## Related Pages
 - [[EVM Calculation Rules]] — ACWP write-lock rules and DoD compliance

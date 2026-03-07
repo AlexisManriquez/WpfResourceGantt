@@ -39,7 +39,11 @@ For each `TemplateGate` (ordered by `SortOrder`):
 2. `TemplateProgressBlock` → `ProgressBlock`
 3. `TemplateProgressItem` → `ProgressItem`
 
-### Phase 3: Finalization
+### Phase 3: Schedule Mode Inheritance
+*   **Inheritance**: The service reads the target SubProject's `ScheduleMode` (Manual/Dynamic).
+*   **Application**: Explicitly assigns this mode to all newly generated WBS items (Gates, Blocks, Tasks) to ensure consistent behavior.
+
+### Phase 4: Finalization
 1. `RecalculateRollup()` on the sub-project
 2. `DataService.RegenerateWbsValues()` for WBS codes
 3. `DataService.SaveDataAsync()` persists to SQL

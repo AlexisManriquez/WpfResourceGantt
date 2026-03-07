@@ -30,7 +30,7 @@ purpose: Central hub — Map of Content for the entire WpfResourceGantt project.
 - [[TemplateService]] — Blueprint-to-live-data conversion engine (dual-path: logic-driven + flat)
 - [[ScheduleCalculationService]] — CPM schedule engine: forward pass, backward pass, float, critical path
 - [[MppImportExport]] — MS Project XML import and native .mpp export
-- [[CsvImportService]] — CSV hours import pipeline
+- [[CsvImportService]] — CSV hours import and Project Reconstruction pipeline
 
 ## Features
 - [[Gantt View]] — Core WBS editing interface with hierarchical tree

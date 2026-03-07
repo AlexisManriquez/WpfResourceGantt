@@ -19,6 +19,7 @@ This document provides a comprehensive reference of the codebase structure, deta
 *   **`JsonConverter.cs`**: Custom JSON serialization logic.
 *   **`RelayCommand.cs`**: (Root version) Basic ICommand implementation.
 *   **`WpfResourceGantt.csproj`**: Project definition file.
+    *   **COM Stabilization**: Uses direct `<COMReference>` for `Microsoft.Office.Interop.Excel` with `EmbedInteropTypes="True"` to prevent assembly resolution errors during reconstruction.
 *   **`appsettings.json`**: Application configuration.
 
 ---
@@ -30,7 +31,7 @@ This document provides a comprehensive reference of the codebase structure, deta
 *   **`MainViewModel.cs`**: (**Core**) The central orchestrator. Manages `CurrentView`, navigation, and global state. See [[MainViewModel]].
 *   **`WorkItem.cs`**: (**Core**) The primary ViewModel wrapper for `WorkBreakdownItem`. Adds `INotifyPropertyChanged` to the data model.
 *   **`DataService.cs`**: (**Core**) Handles all I/O operations (saving/loading `ProjectDataFromMpp.json`). See [[DataService]].
-*   **`CsvImportService.cs`**: Handles importing hours from CSV files.
+*   **`CsvImportService.cs`**: Handles importing hours from CSV/Excel and **Project Reconstruction** (WBS hierarchy generation from external data).
 *   **`ProjectManagementModule.cs`**: Dependency injection or module initialization logic.
 *   **`RelayCommand.cs`**: (ProjectManagement version) `ICommand` implementation used by ViewModels.
 *   **`StringToIsNotEmptyConverter.cs`**: Helper converter in root PM folder.
@@ -164,5 +165,5 @@ This document provides a comprehensive reference of the codebase structure, deta
 
 ### 14. 📁 Dialogs
 **Location**: `ProjectManagement\Features\Dialogs`
-*   Contains shared dialogs for system export and block imports.
-*   **Files**: `ExportSystemDialogView.xaml`, `ExportSystemDialogViewModel.cs`, `ImportTestBlocksDialog.xaml`, `ImportTestBlocksDialogViewModel.cs`.
+*   Contains shared dialogs for system export, block imports, and project reconstruction.
+*   **Files**: `ExportSystemDialogView.xaml`, `ExportSystemDialogViewModel.cs`, `ImportTestBlocksDialog.xaml`, `ImportTestBlocksDialogViewModel.cs`, `ReconstructProjectDialogView.xaml`, `ReconstructProjectDialogViewModel.cs`.
