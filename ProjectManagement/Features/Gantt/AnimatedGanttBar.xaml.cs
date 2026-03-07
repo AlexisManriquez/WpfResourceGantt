@@ -84,6 +84,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
         private Border _summaryHealthBackground;
 
         private Border _summaryProgressFill;
+        private Border _criticalPathBorder;
         public MetricStatus HealthStatus // This property is now the correct type
         {
             get => (MetricStatus)GetValue(HealthStatusProperty);
@@ -186,6 +187,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
             _taskProgressBar = this.FindName("TaskProgressBar") as Border;
             _summaryHealthBackground = this.FindName("SummaryHealthBackground") as Border;
             _summaryProgressFill = this.FindName("SummaryProgressFill") as Border;
+            _criticalPathBorder = this.Template.FindName("CriticalPathBorder", this) as Border;
             _baselineBar = this.FindName("BaselineBar") as Border;
         }
 
@@ -304,7 +306,27 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
 
                 _taskBarGrid.Margin = new Thickness(leftMargin, 0, 0, 0);
                 _taskBarGrid.Width = visualBarWidth;
+                // APPLY: Health Colors to Leaf Tasks
+                switch (HealthStatus)
+                {
+                    case MetricStatus.Warning:
+                        TaskProgressBar.Background = _warningFill;
+                        break;
+                    case MetricStatus.Bad:
+                        TaskProgressBar.Background = _badFill;
+                        break;
+                    case MetricStatus.Good:
+                    default:
+                        TaskProgressBar.Background = _goodFill;
+                        break;
+                }
 
+                // APPLY: Critical Path Border
+                if (_criticalPathBorder != null)
+                {
+                    _criticalPathBorder.Visibility = IsCritical ? Visibility.Visible : Visibility.Collapsed;
+                    _criticalPathBorder.BorderBrush = Brushes.Red;
+                }
                 if (animate && _taskProgressBar != null)
                 {
                     var animation = new DoubleAnimation(0, finalProgressWidth, duration) { EasingFunction = easing };

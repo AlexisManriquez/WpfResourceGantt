@@ -15,12 +15,12 @@ namespace WpfResourceGantt.ProjectManagement.Services
         /// dates, SV, CV) on every node in the given system collection.
         /// This is the primary entry point — call after any data load or change.
         /// </summary>
-        void RecalculateAll(IEnumerable<SystemItem> systems);
+        void RecalculateAll(IEnumerable<SystemItem> systems, System.DateTime? statusDate = null);
 
         /// <summary>
         /// Recalculates a single WorkBreakdownItem and all its descendants.
         /// Use for targeted refresh without reloading the full tree.
         /// </summary>
-        void RecalculateSubTree(WorkBreakdownItem item);
+        void RecalculateSubTree(WorkBreakdownItem item, System.DateTime? statusDate = null);
     }
 }

@@ -36,6 +36,9 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
         public MainViewModel MainViewModel { get; }
         // CHANGE 1: Add a private field to hold the data service.
         private readonly DataService _dataService;
+        private readonly IEnumerable<SystemItem> _simulatedData;
+        public bool IsSimulationMode => _simulatedData != null;
+        public DateTime? SimulatedDate { get; set; }
         private User _selectedUser;
 
         private CancellationTokenSource _expandCts;
@@ -485,8 +488,10 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
             var visibleBlocksIds = new HashSet<string>();
             GetStateRecursive(WorkItems, expandedIds, visibleBlocksIds);
 
-            // 2. RELOAD DATA
-            var userSystems = _dataService.GetSystemsForUser(MainViewModel.CurrentUser);
+            // 2. RELOAD DATA (CHECK FOR SIMULATION MODE)
+            var userSystems = IsSimulationMode
+                ? _simulatedData.ToList()
+                : _dataService.GetSystemsForUser(MainViewModel.CurrentUser);
             var workItemsToShow = ConvertToWorkItems(userSystems);
 
             CalculateTimeline(workItemsToShow);
@@ -549,11 +554,11 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                 SetStateRecursive(item.Children, expandedIds, visibleBlocksIds);
             }
         }
-        public GanttViewModel(MainViewModel mainViewModel, DataService dataService)
+        public GanttViewModel(MainViewModel mainViewModel, DataService dataService, IEnumerable<SystemItem> simulatedData = null)
         {
             MainViewModel = mainViewModel;
             _dataService = dataService;
-
+            _simulatedData = simulatedData;
             // Initialize collections and commands
             WorkItems = new ObservableCollection<WorkItem>();
             FitToScreenCommand = new RelayCommand<object>(FitToScreen);
@@ -583,7 +588,11 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
 
             AddColumnCommand = new RelayCommand<GanttColumn>(AddColumn);
             RemoveColumnCommand = new RelayCommand<GanttColumn>(RemoveColumn);
-            _dataService.DataChanged += OnDataChanged;
+            // PREVENT LIVE DATA UPDATES FROM REFRESHING THE SANDBOX
+            if (!IsSimulationMode)
+            {
+                _dataService.DataChanged += OnDataChanged;
+            }
         }
         private void OnDataChanged(object sender, EventArgs e)
         {
@@ -693,6 +702,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
 
         private async void DeleteSystem(WorkItem workItem)
         {
+            if (IsSimulationMode) { MessageBox.Show("Disabled in Sandbox Mode.", "Simulation"); return; }
             if (workItem == null || !workItem.IsSystem) return;
 
             var result = MessageBox.Show(
@@ -747,6 +757,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
 
         private async void ImportHours()
         {
+            if (IsSimulationMode) { MessageBox.Show("Disabled in Sandbox Mode.", "Simulation"); return; }
             var openFileDialog = new OpenFileDialog
             {
                 Filter = "CSV Files (*.csv)|*.csv|All files (*.*)|*.*",
@@ -905,6 +916,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
         // --- REPLACE your ReorderItems method with this "SURGICAL UPDATE" version ---
         public async Task ReorderItems(string draggedId, string targetId, string position)
         {
+            if (IsSimulationMode) return;
+
             // 1. Reorder the backend data list.
             bool success = _dataService.ReorderWorkItem(draggedId, targetId, position);
             if (!success)
@@ -956,11 +969,14 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
         }
         private void LoadDataForCurrentUser()
         {
-            if (MainViewModel.CurrentUser == null) return;
+            if (MainViewModel?.CurrentUser == null && !IsSimulationMode) return;
             var expandedIds = new HashSet<string>();
             var visibleBlocksIds = new HashSet<string>();
             GetStateRecursive(WorkItems, expandedIds, visibleBlocksIds);
-            var userSystems = _dataService.GetSystemsForUser(MainViewModel.CurrentUser);
+            // CHECK FOR SIMULATION MODE
+            var userSystems = IsSimulationMode
+                ? _simulatedData.ToList()
+                : _dataService.GetSystemsForUser(MainViewModel.CurrentUser);
 
             var workItemsToShow = ConvertToWorkItems(userSystems);
 
@@ -1141,6 +1157,9 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
         }
         private void CalculateOverallHealthRecursively(WorkItem item)
         {
+            DateTime statusDate = (IsSimulationMode && SimulatedDate.HasValue)
+                ? SimulatedDate.Value
+                : DateTime.Today;
             // --- RECURSIVE STEP: First, ensure all children have their health calculated. ---
             // We process from the bottom-up to ensure we have the correct child health to roll up.
             foreach (var child in item.Children)
@@ -1151,21 +1170,37 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
             // --- METRIC 1: Date-Based Schedule Health (for this item) ---
             // This logic only applies if the item is a Task, otherwise it's Good by default.
             MetricStatus dateHealth = MetricStatus.Good;
-            if (!item.Children.Any()) // This is a Task
+            if (!item.Children.Any()) // Leaf Task
             {
                 if (item.Progress >= 1.0)
                 {
-                    if ((item.ActualFinishDate ?? DateTime.MaxValue) > item.EndDate)
-                        dateHealth = MetricStatus.Bad; // Completed LATE
+                    dateHealth = (item.ActualFinishDate ?? DateTime.MaxValue) > item.EndDate
+                        ? MetricStatus.Bad
+                        : MetricStatus.Good;
                 }
-                else if (DateTime.Today < item.StartDate)
-                    dateHealth = MetricStatus.Warning; // Not Started
-                else if (DateTime.Today > item.EndDate)
-                    dateHealth = MetricStatus.Bad; // Past due and not complete
+                else if (statusDate < item.StartDate)
+                {
+                    dateHealth = MetricStatus.Good;
+                }
+                else if (statusDate > item.EndDate)
+                {
+                    dateHealth = MetricStatus.Bad;
+                }
                 else if (item.EndDate > item.StartDate)
                 {
-                    double expected = (DateTime.Today - item.StartDate).TotalDays / (item.EndDate - item.StartDate).TotalDays;
-                    if (item.Progress < expected - 0.05) dateHealth = MetricStatus.Bad;
+                    // FIX: Use WorkBreakdownItem.GetBusinessDaysSpan to match the EVM Engine
+                    int totalWorkDays = Models.WorkBreakdownItem.GetBusinessDaysSpan(item.StartDate, item.EndDate);
+                    int elapsedWorkDays = Models.WorkBreakdownItem.GetBusinessDaysSpan(item.StartDate, statusDate);
+
+                    double expected = totalWorkDays > 0 ? (double)elapsedWorkDays / totalWorkDays : 0;
+
+                    // Now 'expected' will match the logic that drives SV/CV
+                    if (item.Progress < expected - 0.05)
+                        dateHealth = MetricStatus.Bad;
+                    else if (item.Progress < expected - 0.001) // Tiny epsilon to prevent floating point jitter
+                        dateHealth = MetricStatus.Warning;
+                    else
+                        dateHealth = MetricStatus.Good;
                 }
             }
 
@@ -1611,7 +1646,9 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
 
         private void UpdateTodayLinePosition()
         {
-            var today = DateTime.Today;
+            var today = (IsSimulationMode && SimulatedDate.HasValue)
+               ? SimulatedDate.Value
+               : DateTime.Today;
 
             // FIX: Tighten the visibility check. 
             // If today is even one second outside the visible range, hide the line.

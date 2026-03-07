@@ -15,6 +15,7 @@
              xmlns:quick="clr-namespace:WpfResourceGantt.ProjectManagement.Features.QuickTasks"
              xmlns:dialogs="clr-namespace:WpfResourceGantt.ProjectManagement.Features.Dialogs"
              xmlns:assign="clr-namespace:WpfResourceGantt.ProjectManagement.Features.AssignDeveloper"
+             xmlns:sim="clr-namespace:WpfResourceGantt.ProjectManagement.Features.Simulation"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -67,6 +68,9 @@
             
             <DataTemplate DataType="{x:Type dialogs:ImportTestBlocksDialogViewModel}">
                 <dialogs:ImportTestBlocksDialog />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type sim:SimulationViewModel}">
+                <sim:SimulationView />
             </DataTemplate>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <Style x:Key="FilterPillStyle" TargetType="RadioButton">

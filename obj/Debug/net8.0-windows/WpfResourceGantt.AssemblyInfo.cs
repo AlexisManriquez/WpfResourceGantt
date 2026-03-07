@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WpfResourceGantt")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3447bb5062da2ad72cdc0c530d92db6f5af9a36b")]
 [assembly: System.Reflection.AssemblyProductAttribute("WpfResourceGantt")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WpfResourceGantt")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

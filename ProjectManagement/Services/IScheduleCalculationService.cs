@@ -5,6 +5,6 @@ namespace WpfResourceGantt.ProjectManagement.Services
 {
     public interface IScheduleCalculationService
     {
-        void CalculateSchedule(IEnumerable<SystemItem> systems);
+        void CalculateSchedule(IEnumerable<SystemItem> systems, System.DateTime? statusDate = null);
     }
 }

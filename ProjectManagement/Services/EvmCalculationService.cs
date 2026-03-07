@@ -35,7 +35,7 @@ namespace WpfResourceGantt.ProjectManagement.Services
         private const double HOURLY_RATE = 195.0;
 
         /// <inheritdoc />
-        public void RecalculateAll(IEnumerable<SystemItem> systems)
+        public void RecalculateAll(IEnumerable<SystemItem> systems, DateTime? statusDate = null)
         {
             if (systems == null) return;
 
@@ -45,13 +45,13 @@ namespace WpfResourceGantt.ProjectManagement.Services
 
                 foreach (var child in system.Children)
                 {
-                    RecalculateSubTree(child);
+                    RecalculateSubTree(child, statusDate);
                 }
             }
         }
 
         /// <inheritdoc />
-        public void RecalculateSubTree(WorkBreakdownItem item)
+        public void RecalculateSubTree(WorkBreakdownItem item, DateTime? statusDate = null)
         {
             if (item == null) return;
 
@@ -59,11 +59,11 @@ namespace WpfResourceGantt.ProjectManagement.Services
 
             if (isLeaf)
             {
-                RecalculateLeaf(item);
+                RecalculateLeaf(item, statusDate);
             }
             else
             {
-                RecalculateSummary(item);
+                RecalculateSummary(item, statusDate);
             }
         }
 
@@ -71,9 +71,9 @@ namespace WpfResourceGantt.ProjectManagement.Services
         // LEAF CALCULATION
         // ─────────────────────────────────────────────────────────────────────
 
-        private void RecalculateLeaf(WorkBreakdownItem item)
+        private void RecalculateLeaf(WorkBreakdownItem item, DateTime? statusDate = null)
         {
-            DateTime today = DateTime.Today;
+            DateTime today = statusDate ?? DateTime.Today;
 
             // ── BAC ──────────────────────────────────────────────────────────
             // Use the stored, baselined BAC if available.
@@ -136,12 +136,12 @@ namespace WpfResourceGantt.ProjectManagement.Services
         // SUMMARY CALCULATION (pure rollup)
         // ─────────────────────────────────────────────────────────────────────
 
-        private void RecalculateSummary(WorkBreakdownItem item)
+        private void RecalculateSummary(WorkBreakdownItem item, DateTime? statusDate = null)
         {
             // ── Bottom-up: recurse children first ────────────────────────────
             foreach (var child in item.Children)
             {
-                RecalculateSubTree(child);
+                RecalculateSubTree(child, statusDate);
             }
 
             // ── Roll up scalar metrics ────────────────────────────────────────

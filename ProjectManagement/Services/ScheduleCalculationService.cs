@@ -7,8 +7,9 @@ namespace WpfResourceGantt.ProjectManagement.Services
 {
     public class ScheduleCalculationService : IScheduleCalculationService
     {
-        public void CalculateSchedule(IEnumerable<SystemItem> systems)
+        public void CalculateSchedule(IEnumerable<SystemItem> systems, DateTime? statusDate = null)
         {
+            DateTime today = statusDate ?? DateTime.Today;
             var allLeafItems = GetAllLeafItems(systems).ToList();
             if (!allLeafItems.Any()) return;
 
@@ -44,14 +45,14 @@ namespace WpfResourceGantt.ProjectManagement.Services
                     // No predecessors: respect existing dates (e.g. from MPP import)
                     // Only default to today if the task has no start date at all
                     if (!item.StartDate.HasValue)
-                        item.StartDate = item.StartNoEarlierThan ?? DateTime.Today;
+                        item.StartDate = item.StartNoEarlierThan ?? today;
                     else if (item.StartNoEarlierThan.HasValue && item.StartNoEarlierThan > item.StartDate)
                         item.StartDate = item.StartNoEarlierThan; // SNET constraint wins
                 }
                 else
                 {
                     // For logic-driven items, start with SNET or existing date, then push forward
-                    item.StartDate = item.StartNoEarlierThan ?? item.StartDate ?? DateTime.Today;
+                    item.StartDate = item.StartNoEarlierThan ?? item.StartDate ?? today;
                 }
                 item.EndDate = WorkBreakdownItem.AddBusinessDays(item.StartDate.Value, item.DurationDays);
             }
@@ -74,7 +75,7 @@ namespace WpfResourceGantt.ProjectManagement.Services
                     var deps = PredecessorParser.Parse(item.Predecessors);
                     if (!deps.Any()) continue;
 
-                    DateTime earliestStart = item.StartNoEarlierThan ?? DateTime.Today;
+                    DateTime earliestStart = item.StartNoEarlierThan ?? today;
 
                     foreach (var dep in deps)
                     {
@@ -87,16 +88,17 @@ namespace WpfResourceGantt.ProjectManagement.Services
                             DateTime calculationSource;
                             switch (dep.Type)
                             {
-                                case DependencyType.SS: calculationSource = pred.StartDate ?? DateTime.Today; break;
-                                case DependencyType.FF: calculationSource = (pred.EndDate ?? DateTime.Today).AddDays(-item.DurationDays); break;
-                                case DependencyType.SF: calculationSource = pred.EndDate ?? DateTime.Today; break;
+                                case DependencyType.SS: calculationSource = pred.StartDate ?? today; break;
+                                case DependencyType.FF: calculationSource = (pred.EndDate ?? today).AddDays(-item.DurationDays); break;
+                                case DependencyType.SF: calculationSource = pred.EndDate ?? today; break;
                                 case DependencyType.FS:
                                 default:
                                     // FS: Start = Finish of Pred + Lag
                                     // Finish of Pred is pred.EndDate. Start of this one is Finish + Lag
-                                    calculationSource = WorkBreakdownItem.AddBusinessDays(pred.EndDate ?? DateTime.Today, 1);
+                                    calculationSource = WorkBreakdownItem.AddBusinessDays(pred.EndDate ?? today, 1);
                                     break;
                             }
+
 
                             DateTime potentialStart = WorkBreakdownItem.AddBusinessDays(calculationSource, dep.LagDays);
                             if (potentialStart > earliestStart) earliestStart = potentialStart;
@@ -120,7 +122,7 @@ namespace WpfResourceGantt.ProjectManagement.Services
             foreach (var group in itemsByProject)
             {
                 var rootId = group.Key;
-                var groupFinish = group.Max(i => i.EndDate ?? DateTime.Today);
+                var groupFinish = group.Max(i => i.EndDate ?? today);
                 projectFinishes[rootId] = groupFinish;
 
                 foreach (var item in group)
@@ -151,7 +153,7 @@ namespace WpfResourceGantt.ProjectManagement.Services
                     }
 
                     string rootId = GetProjectRootId(item.Id);
-                    DateTime latestFinish = projectFinishes.ContainsKey(rootId) ? projectFinishes[rootId] : DateTime.Today;
+                    DateTime latestFinish = projectFinishes.ContainsKey(rootId) ? projectFinishes[rootId] : today;
 
                     foreach (var succ in successors)
                     {
@@ -163,12 +165,12 @@ namespace WpfResourceGantt.ProjectManagement.Services
                             DateTime potentialLF;
                             switch (dep.Type)
                             {
-                                case DependencyType.SS: potentialLF = WorkBreakdownItem.AddBusinessDays(succ.LateStart ?? DateTime.Today, item.DurationDays); break;
-                                case DependencyType.FF: potentialLF = succ.LateFinish ?? DateTime.Today; break;
-                                case DependencyType.SF: potentialLF = succ.LateStart ?? DateTime.Today; break;
+                                case DependencyType.SS: potentialLF = WorkBreakdownItem.AddBusinessDays(succ.LateStart ?? today, item.DurationDays); break;
+                                case DependencyType.FF: potentialLF = succ.LateFinish ?? today; break;
+                                case DependencyType.SF: potentialLF = succ.LateStart ?? today; break;
                                 case DependencyType.FS:
                                 default:
-                                    potentialLF = WorkBreakdownItem.AddBusinessDays(succ.LateStart ?? DateTime.Today, -1);
+                                    potentialLF = WorkBreakdownItem.AddBusinessDays(succ.LateStart ?? today, -1);
                                     break;
                             }
 

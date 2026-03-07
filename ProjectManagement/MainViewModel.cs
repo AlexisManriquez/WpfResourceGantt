@@ -108,6 +108,7 @@ namespace WpfResourceGantt.ProjectManagement
         public ICommand ShowEVMViewCommand { get; }
         public ICommand ShowSystemManagementCommand { get; }
         public ICommand ToggleRibbonCommand { get; }
+        public ICommand ShowSimulationCommand { get; }
 
         // === VIEW TAB COMMANDS ===
         public ICommand ZoomInCommand { get; }
@@ -223,7 +224,7 @@ namespace WpfResourceGantt.ProjectManagement
                     OnPropertyChanged(nameof(IsUsersVisible));
                     OnPropertyChanged(nameof(IsProjectsVisible));
                     OnPropertyChanged(nameof(IsGateProgressVisible));
-
+                    OnPropertyChanged(nameof(IsSimulationVisible));
                     // SWITCH THE INNER VIEWMODEL BASED ON THE STRING
                     switch (value)
                     {
@@ -253,6 +254,9 @@ namespace WpfResourceGantt.ProjectManagement
                             break;
                         case "GateProgress":
                             break;
+                        case "Simulation": // <-- ADD THIS CASE
+                            ShowSimulationView();
+                            break;
                     }
 
                     if (IsAnalyticsVisible)
@@ -273,13 +277,13 @@ namespace WpfResourceGantt.ProjectManagement
         public bool IsUsersVisible => CurrentView == "Users";
         public bool IsProjectsVisible => CurrentView == "Projects";
         public bool IsQuickTasksVisible => CurrentView == "QuickTasks";
-
+        public bool IsSimulationVisible => CurrentView == "Simulation";
         public bool IsGateProgressVisible => CurrentView == "GateProgress";
-        public bool IsRangeSectionVisible => IsGanttVisible || IsAnalyticsVisible;
+        public bool IsRangeSectionVisible => IsGanttVisible || IsAnalyticsVisible || IsSimulationVisible;
 
         // Combined visibility for the legacy ProjectManagementControl wrapper
         // Note: Projects is now handled by the PM Control too.
-        public bool IsProjectManagementVisible => !IsDeveloperPortalVisible && (IsDashboardVisible || IsEVMVisible || IsSystemsVisible || IsUsersVisible || IsProjectsVisible || IsQuickTasksVisible || IsGateProgressVisible || IsGanttVisible || IsAnalyticsVisible);
+        public bool IsProjectManagementVisible => !IsDeveloperPortalVisible && (IsDashboardVisible || IsEVMVisible || IsSystemsVisible || IsUsersVisible || IsProjectsVisible || IsQuickTasksVisible || IsGateProgressVisible || IsGanttVisible || IsAnalyticsVisible || IsSimulationVisible);
 
         // === ADD TASK MODAL PROPERTIES ===
         private bool _isAddTaskModalOpen;
@@ -372,6 +376,7 @@ namespace WpfResourceGantt.ProjectManagement
             ShowEVMCommand = new RelayCommand(() => CurrentView = "EVM");
             ShowUsersCommand = new RelayCommand(() => CurrentView = "Users");
             ToggleRibbonCommand = new RelayCommand(() => IsRibbonExpanded = !IsRibbonExpanded);
+            ShowSimulationCommand = new RelayCommand(() => CurrentView = "Simulation");
             // Legacy Command Properties (Keeping for compatibility if C# code references them)
             ShowGanttViewCommand = ShowGanttCommand;
             ShowDashboardViewCommand = ShowDashboardCommand;
@@ -737,7 +742,11 @@ namespace WpfResourceGantt.ProjectManagement
             CurrentViewModel = new DashboardViewModel(_dataService, CurrentUser);
         }
 
-
+        private void ShowSimulationView()
+        {
+            // Pass 'this' into the constructor
+            CurrentViewModel = new WpfResourceGantt.ProjectManagement.Features.Simulation.SimulationViewModel(this, _dataService);
+        }
 
         public void GoToGateProgress(WorkItem subProject)
         {

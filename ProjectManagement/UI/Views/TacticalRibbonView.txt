@@ -127,11 +127,6 @@
                             Tag="{StaticResource Icon_Import}"
                             Command="{Binding DataContext.CloseWeekCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                             ToolTip="Freeze weekly EVM snapshot for all SubProjects (PM only). Complete SMTS import before closing the week."/>
-                    <Button Style="{StaticResource TacticalRibbonButtonStyle}" 
-                            Content="PLAY-&#x0a;GROUND" 
-                            Tag="{StaticResource Icon_Analytics}" 
-                            Command="{Binding DataContext.ShowSimulationCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                            ToolTip="Enter the what-if temporal sandbox environment"/>
                 </StackPanel>
                 <TextBlock Grid.Row="1" Grid.Column="4" Text="ACTIONS" Style="{StaticResource TacticalCategoryLabelStyle}"/>
                 <!-- NEW: RIBBON TOGGLE BUTTON -->
