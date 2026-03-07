@@ -1,0 +1,138 @@
+<UserControl x:Class="WpfResourceGantt.ProjectManagement.Features.Dialogs.ReconstructProjectDialogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:conv="clr-namespace:WpfResourceGantt.ProjectManagement.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="550" d:DesignWidth="500">
+    <UserControl.Resources>
+        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <!-- Background and Border matching SelectSystemDialogView -->
+    <Border Background="{StaticResource AppBackgroundBrush}" 
+            CornerRadius="12" 
+            BorderBrush="{StaticResource TacticalBorderBrush}" 
+            BorderThickness="1" 
+            Padding="30">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Header -->
+                <RowDefinition Height="Auto"/>
+                <!-- System Section -->
+                <RowDefinition Height="Auto"/>
+                <!-- Project Section -->
+                <RowDefinition Height="*"/>
+                <!-- Spacer -->
+                <RowDefinition Height="Auto"/>
+                <!-- Buttons -->
+            </Grid.RowDefinitions>
+
+            <!-- 1. Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,25">
+                <TextBlock Text="Reconstruct Project" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TacticalGoldBrush}"/>
+                <TextBlock Text="Parse SMTS CSV data to reconstruct the WBS hierarchy and import execution history." 
+                           Foreground="{StaticResource TextSecondaryBrush}" 
+                           TextWrapping="Wrap" 
+                           Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <!-- 2. System Context (Destination) -->
+            <StackPanel Grid.Row="1" Margin="0,0,0,20">
+                <TextBlock Text="System Context" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TacticalGoldBrush}" Margin="0,0,0,10"/>
+
+                <!-- Option A: Existing -->
+                <RadioButton x:Name="OptExisting" 
+                             IsChecked="{Binding IsCreateNewSystem, Converter={StaticResource InverseBooleanConverter}, Mode=TwoWay}" 
+                             GroupName="Dest" Margin="0,0,0,8">
+                    <TextBlock Text="Add to Existing System" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </RadioButton>
+
+                <ComboBox ItemsSource="{Binding ExistingSystems}" 
+                          SelectedItem="{Binding SelectedSystem}" 
+                          DisplayMemberPath="Name"
+                          Margin="25,0,0,15"
+                          Height="32"
+                          IsEnabled="{Binding IsChecked, ElementName=OptExisting}"/>
+
+                <!-- Option B: New -->
+                <RadioButton x:Name="OptNew" 
+                             IsChecked="{Binding IsCreateNewSystem}" 
+                             GroupName="Dest" Margin="0,0,0,8">
+                    <TextBlock Text="Create New System" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </RadioButton>
+
+                <Grid Margin="25,0,0,0" IsEnabled="{Binding IsChecked, ElementName=OptNew}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Labels -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Number" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,2"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="System Name" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,2"/>
+
+                    <!-- Inputs -->
+                    <TextBox Grid.Row="1" Grid.Column="0" 
+                             Text="{Binding NewSystemNumber, UpdateSourceTrigger=PropertyChanged}" 
+                             Height="32" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+
+                    <TextBox Grid.Row="1" Grid.Column="1" 
+                             Text="{Binding NewSystemName, UpdateSourceTrigger=PropertyChanged}" 
+                             Margin="10,0,0,0" Height="32" VerticalContentAlignment="Center"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- 3. Project Details -->
+            <StackPanel Grid.Row="2">
+                <TextBlock Text="Project Details" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TacticalGoldBrush}" Margin="0,10,0,10"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Labels -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Number" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,2"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Project Name" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,2"/>
+
+                    <!-- Inputs -->
+                    <TextBox Grid.Row="1" Grid.Column="0" 
+                             Text="{Binding ProjectNumber, UpdateSourceTrigger=PropertyChanged}" 
+                             Height="32" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+
+                    <TextBox Grid.Row="1" Grid.Column="1" 
+                             Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}" 
+                             Margin="10,0,0,0" Height="32" VerticalContentAlignment="Center"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- 4. Action Buttons -->
+            <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="Cancel" 
+                        Command="{Binding CancelCommand}"
+                        Style="{StaticResource BtnOutline}" 
+                        Width="100"
+                        Margin="0,0,12,0"/>
+
+                <Button Content="Reconstruct" 
+                        Command="{Binding ConfirmCommand}"
+                        Style="{StaticResource BtnPrimary}" 
+                        Width="130"
+                        IsDefault="True"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

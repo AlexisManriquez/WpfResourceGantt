@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="WpfResourceGantt.ProjectManagement.Features.Dialogs.ImportTestBlocksDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Height="300" Width="500">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../UI/Styles/CoreStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border Background="{StaticResource AppBackgroundBrush}" CornerRadius="8" BorderBrush="{StaticResource TacticalBorderBrush}" BorderThickness="1" Padding="20">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Header -->
+                <RowDefinition Height="Auto"/>
+                <!-- Gate Selection -->
+                <RowDefinition Height="Auto"/>
+                <!-- File Selection -->
+                <RowDefinition Height="*"/>
+                <!-- Spacer -->
+                <RowDefinition Height="Auto"/>
+                <!-- Buttons -->
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Import Test Blocks" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
+
+            <!-- Gate Selection -->
+            <StackPanel Grid.Row="1" Margin="0,0,0,15">
+                <TextBlock Text="Target Gate / Task:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <ComboBox ItemsSource="{Binding AvailableGates}" 
+                          SelectedItem="{Binding SelectedGate}"
+                          DisplayMemberPath="Name"
+                          Height="30"/>
+                <TextBlock Text="Select the item where the test blocks will be added." FontSize="10" Foreground="Gray"/>
+            </StackPanel>
+
+            <!-- File Selection -->
+            <StackPanel Grid.Row="2" Margin="0,0,0,15">
+                <TextBlock Text="CSV File Source:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Text="{Binding SelectedFilePath}" IsReadOnly="True" VerticalAlignment="Center" Height="30" Padding="2"/>
+                    <Button Grid.Column="1" Content="..." Command="{Binding BrowseCommand}" Width="40" Margin="5,0,0,0"/>
+                </Grid>
+                <TextBlock Text="Format: Test Block, Test No., Test Name" FontSize="10" Foreground="Gray"/>
+            </StackPanel>
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Cancel" Command="{Binding CancelCommand}"  Width="100" Margin="0,0,10,0"/>
+                <Button Content="Import" Command="{Binding ImportCommand}" Style="{StaticResource TacticalPrimaryButtonStyle}" Width="100"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

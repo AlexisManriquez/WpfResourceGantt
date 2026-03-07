@@ -1,0 +1,228 @@
+{
+  "main": {
+    "id": "6144620e8fe50c26",
+    "type": "split",
+    "children": [
+      {
+        "id": "485681b5228281ef",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d80448f7271b103d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Features/System Management.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "System Management"
+            }
+          },
+          {
+            "id": "59a076661b771c36",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "hgj.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "hgj"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "bfa4cf64fdce9942",
+    "type": "split",
+    "children": [
+      {
+        "id": "0e0ba01e8ab639d1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5f83ef19d34ea65a",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "1d985d73701eecbe",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "b6325cd813de76fb",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "b86e56b5e68defaf",
+    "type": "split",
+    "children": [
+      {
+        "id": "bd4f26f157a3f3b7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "cd33e45b05a641a6",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Architecture/Data Hierarchy.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Data Hierarchy"
+            }
+          },
+          {
+            "id": "b75bfd11a4dfcebf",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "APP_BREAKDOWN.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from APP_BREAKDOWN"
+            }
+          },
+          {
+            "id": "849726066c7be843",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "698cec5c1cda96e1",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "0d9dc8e3ab0484a8",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "APP_BREAKDOWN.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of APP_BREAKDOWN"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "d80448f7271b103d",
+  "lastOpenFiles": [
+    "Services/DataService.md",
+    "Features/User Management.md",
+    "Architecture/Data Hierarchy.md",
+    "Architecture/App Overview.md",
+    "Architecture/Common Modifications.md",
+    "Features/EVM.md",
+    "Features/Gantt View.md",
+    "Features/System Management.md",
+    "Features/Gate Progress.md",
+    "Architecture/Navigation & Ribbons.md",
+    "Infrastructure/MainViewModel.md",
+    "APP_BREAKDOWN.md",
+    "00 - Home.md",
+    "PROJECT_STRUCTURE.md",
+    "Architecture/EVM Calculation Rules.md",
+    "Services/ScheduleCalculationService.md",
+    "Features/Resource Gantt.md",
+    "Architecture/Data Lifecycle.md",
+    "Features/Apply Template Flow.md",
+    "Models/EvmWeeklySnapshot.md",
+    "Features/Project Creation.md",
+    "Features/Analytics.md",
+    "hgj.md",
+    "SuperCharge AI.md",
+    "Infrastructure/Converters.md"
+  ]
+}

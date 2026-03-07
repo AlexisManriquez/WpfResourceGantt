@@ -1,0 +1,102 @@
+<UserControl  x:Class="WpfResourceGantt.ProjectManagement.Features.AssignDeveloper.AssignDeveloperDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfResourceGantt.ProjectManagement"
+        mc:Ignorable="d"
+        Background="Transparent"
+        MinHeight="550" Width="520">
+
+    <UserControl.Resources>
+        <local:StringToIsNotEmptyConverter x:Key="StringToIsNotEmptyConverter"/>
+    </UserControl.Resources>
+
+    <Border Background="{StaticResource AppBackgroundBrush}" 
+            CornerRadius="12" 
+            BorderBrush="{StaticResource BorderBrush}" 
+            BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect ShadowDepth="0" BlurRadius="20" Color="Black" Opacity="0.5"/>
+        </Border.Effect>
+
+        <Grid Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,0,0,25">
+                <TextBlock Text="Assign Developer" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TacticalGoldBrush}"/>
+                <TextBlock Text="Select a developer and define their role for this task." Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10">
+                <StackPanel>
+                    <TextBlock Text="Currently Assigned" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+                    <ItemsControl ItemsSource="{Binding CurrentAssignments}" Margin="0,0,0,20">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource SurfaceBrush}" CornerRadius="4" Margin="0,0,0,4" Padding="8,4">
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="👤" Margin="0,0,8,0" VerticalAlignment="Center"/>
+
+                                            <!-- UPDATED: Bind directly to the wrapper properties -->
+                                            <TextBlock Text="{Binding DeveloperName}" 
+                                                   Foreground="White" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Assignment.Role, StringFormat=' ({0})'}" 
+                                                   Foreground="{StaticResource TacticalTextMutedBrush}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+
+                                        <Button HorizontalAlignment="Right" 
+                                            Command="{Binding DataContext.RemoveAssignmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}"
+                                            Content="✕" Foreground="#FF4545" Background="Transparent" BorderThickness="0" Cursor="Hand"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Separator Background="{StaticResource DividerBrush}" Margin="0,0,0,20"/>
+
+                    <TextBlock Text="Add New Assignment" FontWeight="SemiBold" Foreground="{StaticResource TacticalGoldBrush}" Margin="0,0,0,10"/>
+                    <ComboBox x:Name="DeveloperComboBox" 
+                          ItemsSource="{Binding Developers}"
+                          SelectedItem="{Binding SelectedDeveloper}"
+                          DisplayMemberPath="Name"
+                          Margin="0,0,0,25"/>
+
+                    <TextBlock Text="Assignment Role" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton x:Name="PrimaryRadio" Content="Primary Developer" IsChecked="{Binding IsPrimary}" GroupName="RoleGroup" Margin="0,0,20,0"/>
+                        <RadioButton x:Name="SecondaryRadio" Content="Support / Secondary" IsChecked="{Binding IsSecondary}" GroupName="RoleGroup"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <!-- Check for Click="UnassignButton_Click" -->
+                <Button Content="Unassign All" 
+            Style="{StaticResource BtnOutline}" 
+            Click="UnassignButton_Click" 
+            Width="110" Margin="0,0,12,0" />
+
+                <!-- Check for Click="CancelButton_Click" -->
+                <Button Content="Cancel" 
+            Style="{StaticResource BtnOutline}" 
+            Click="CancelButton_Click" 
+            Width="100" Margin="0,0,12,0"/>
+
+                <!-- Check for Click="AssignButton_Click" -->
+                <Button Content="Assign Task" 
+            IsDefault="True" 
+            Style="{StaticResource BtnPrimary}" 
+            Click="AssignButton_Click" 
+            Width="130" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

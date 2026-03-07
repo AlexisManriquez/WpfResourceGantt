@@ -1,0 +1,654 @@
+<UserControl x:Class="WpfResourceGantt.ProjectManagement.Features.DeveloperPortal.DeveloperPortalView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfResourceGantt.ProjectManagement.Features.DeveloperPortal"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="1200"
+             Background="{StaticResource AppBackgroundBrush}">
+
+    <UserControl.Resources>
+        <!-- Use the global BoolToVis from App.xaml instead of redefining it incorrectly -->
+        <!-- Modern Checkbox for Progress Blocks -->
+        <Style x:Key="ModernCheckStyle" TargetType="CheckBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- The Circle/Check Icon -->
+                            <Path x:Name="CheckIcon"
+                          Data="{StaticResource Icon_Checkbox_EmptyCircle}"
+                          Fill="{StaticResource TextSecondaryBrush}"
+                          Width="16" Height="16"
+                          Stretch="Uniform"
+                          VerticalAlignment="Center"
+                          Margin="0,0,10,0"/>
+
+                            <ContentPresenter Grid.Column="1" 
+                                      VerticalAlignment="Center"
+                                      RecognizesAccessKey="True"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckIcon" Property="Data" Value="{StaticResource Icon_CheckCircle_Filled}"/>
+                                <Setter TargetName="CheckIcon" Property="Fill" Value="{StaticResource StatusCompletedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckIcon" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- MODERN ACCORDION STYLE -->
+        <Style x:Key="ModernExpanderStyle" TargetType="{x:Type Expander}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="IsExpanded" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Expander}">
+                        <DockPanel>
+                            <!-- 1. The ToggleButton (Header) -->
+                            <ToggleButton x:Name="HeaderSite"
+                                  DockPanel.Dock="Top"
+                                  Height="Auto"
+                                  Padding="0,16"
+                                  Cursor="Hand"
+                                  IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                  Background="Transparent">
+                                <!-- 
+                             LINK 1: Pass the Expander's Header and Template down to the ToggleButton 
+                        -->
+                                <ToggleButton.Content>
+                                    <Binding Path="Header" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                </ToggleButton.Content>
+                                <ToggleButton.ContentTemplate>
+                                    <Binding Path="HeaderTemplate" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                </ToggleButton.ContentTemplate>
+
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="Transparent" 
+                                        BorderBrush="{StaticResource TacticalSeparatorBrush}" 
+                                        BorderThickness="0,0,0,1">
+                                            <Grid Margin="{TemplateBinding Padding}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- 
+                                             LINK 2: The ContentPresenter must show the ToggleButton's Content
+                                             which we just linked to the Expander's Header above.
+                                        -->
+                                                <ContentPresenter Grid.Column="0"
+                                                          Content="{TemplateBinding Content}"
+                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                          VerticalAlignment="Center"
+                                                          HorizontalAlignment="Stretch"
+                                                          RecognizesAccessKey="True"/>
+
+                                                <Path x:Name="arrow"
+                                              Grid.Column="1"
+                                              Data="{StaticResource Icon_ChevronDown}"
+                                              Stroke="{StaticResource TextSecondaryBrush}"
+                                              StrokeThickness="2"
+                                              Width="12" Height="8"
+                                              Stretch="Uniform"
+                                              VerticalAlignment="Center"
+                                              Margin="10,0,0,0"
+                                              RenderTransformOrigin="0.5,0.5">
+                                                    <Path.RenderTransform>
+                                                        <RotateTransform Angle="0"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <!-- 1. HOVER STATE: Highlight the arrow and text -->
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <!-- Change arrow color to Gold on hover -->
+                                                <Setter TargetName="arrow" Property="Stroke" Value="{StaticResource TacticalGoldBrush}"/>
+                                                <!-- Optional: You can also slightly highlight the header background -->
+                                                <Setter Property="Background" Value="#2E3339"/>
+                                            </Trigger>
+
+                                            <!-- 2. EXPANDED STATE (IsChecked = True) -->
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <!-- Rotate the arrow 180 degrees -->
+                                                <Setter TargetName="arrow" Property="RenderTransform">
+                                                    <Setter.Value>
+                                                        <RotateTransform Angle="180"/>
+                                                    </Setter.Value>
+                                                </Setter>
+
+                                                <!-- 
+           REACT STYLE REFINEMENT: 
+           In the React design, the line below the header often disappears 
+           or changes when open to make the content feel connected.
+           If your Border is named "headerBorder", uncomment this:
+        -->
+                                                <!-- <Setter TargetName="headerBorder" Property="BorderBrush" Value="Transparent"/> -->
+                                            </Trigger>
+
+                                            <!-- 3. PRESSED STATE: Visual feedback when clicking -->
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter Property="Opacity" Value="0.7"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <!-- 2. The Content Area -->
+                            <ContentPresenter x:Name="ExpandSite"
+                                      DockPanel.Dock="Bottom"
+                                      Visibility="Collapsed"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Top"/>
+                        </DockPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Setter TargetName="ExpandSite" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Assignment Card Template -->
+        <DataTemplate x:Key="AssignmentCardTemplate">
+            <!-- Visual Root -->
+            <Border x:Name="CardBorder"
+    Background="{StaticResource QuickTasks_ItemBrush}" 
+    BorderBrush="{StaticResource QuickTasks_BorderBrush}" 
+    BorderThickness="1" 
+    CornerRadius="6" 
+    Margin="0,0,0,12" 
+    Padding="16">
+
+                <StackPanel>
+                    <!-- ROW 1: Header (Dot, Title, ID, Badge) -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <!-- Dot -->
+                            <ColumnDefinition Width="*"/>
+                            <!-- Title/ID -->
+                            <ColumnDefinition Width="Auto"/>
+                            <!-- Status Badge -->
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Status Dot -->
+                        <Ellipse x:Name="StatusDot" 
+                 Width="8" Height="8" 
+                 Fill="{StaticResource StateActiveDotBrush}" 
+                 VerticalAlignment="Top" Margin="0,6,12,0"/>
+
+                        <!-- Title and ID -->
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding Name}" 
+                       Foreground="{StaticResource TextPrimaryBrush}" 
+                       FontWeight="Bold" 
+                       FontSize="14"/>
+                            <TextBlock Text="{Binding WbsValue}" 
+                       Foreground="{StaticResource TextSecondaryBrush}" 
+                       FontSize="12" 
+                       Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <!-- Status Badge (Pill) -->
+                        <Border x:Name="StatusBadge"
+                Background="{StaticResource StateActiveBgBrush}" 
+                CornerRadius="12" 
+                Padding="10,2" 
+                VerticalAlignment="Top">
+                            <TextBlock x:Name="StatusText" 
+                       Text="In Progress" 
+                       Foreground="{StaticResource TextPrimaryBrush}" 
+                       FontSize="11" 
+                       FontWeight="Medium"/>
+                        </Border>
+                    </Grid>
+
+                    <!-- ROW 2: Dates -->
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
+                        <Path Data="{StaticResource Icon_Calendar}" 
+              Fill="{StaticResource TextSecondaryBrush}" 
+              Width="12" Height="12" 
+              Stretch="Uniform" 
+              Margin="0,0,8,0" 
+              VerticalAlignment="Center"/>
+                        <TextBlock Foreground="{StaticResource TextSecondaryBrush}" FontSize="12">
+            <Run Text="{Binding StartDate, StringFormat=MMM dd, TargetNullValue=TBD}"/>
+            <Run Text=" → "/>
+            <Run Text="{Binding EndDate, StringFormat=MMM dd, TargetNullValue=TBD}"/>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <!-- ROW 3: Progress -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Progress" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
+
+                        <!-- Assuming Progress is 0.0 to 1.0 -->
+                        <ProgressBar Grid.Column="1" 
+                     Style="{StaticResource TacticalProgressBarStyle}"
+                     Value="{Binding Progress}" 
+                     Maximum="1" 
+                     Margin="12,0"/>
+
+                        <TextBlock Grid.Column="2" 
+                   Text="{Binding Progress, StringFormat=P0}" 
+                   Foreground="{StaticResource TextPrimaryBrush}" 
+                   FontSize="12" 
+                   FontWeight="SemiBold"
+                   VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <!-- ROW 4: Sub-Tasks (Progress Blocks) -->
+                    <Expander Margin="0" IsExpanded="{Binding IsTestBlocksExpanded, Mode=TwoWay}">
+                        <Expander.Style>
+                            <Style TargetType="Expander" BasedOn="{StaticResource ModernExpanderStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ProgressBlocks.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Expander.Style>
+
+                        <Expander.Header>
+                            <TextBlock Text="{Binding ProgressBlocks.Count, StringFormat='Test Blocks ({0})'}" 
+                   Foreground="{StaticResource TextSecondaryBrush}" 
+                   FontSize="12"/>
+                        </Expander.Header>
+
+                        <!-- OUTER LIST: The Blocks (e.g., "Unit Tests") -->
+                        <ItemsControl ItemsSource="{Binding ProgressBlocks}" Margin="12,8,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,0,0,12">
+                                        <!-- Group Header (Muted) -->
+                                        <TextBlock Text="{Binding Name}" 
+                               Foreground="{StaticResource TextSecondaryBrush}" 
+                               FontSize="11" FontWeight="Bold" 
+                               Margin="0,0,0,6" Opacity="0.7"/>
+
+                                        <!-- INNER LIST: The actual checkable items -->
+                                        <ItemsControl ItemsSource="{Binding Items}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <!-- Bind IsChecked to your model property (usually IsCompleted or IsChecked) -->
+                                                    <CheckBox Style="{StaticResource ModernCheckStyle}"
+          IsChecked="{Binding IsCompleted, Mode=TwoWay}" 
+          Command="{Binding DataContext.ToggleBlockItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+          CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContentPresenter, AncestorLevel=3}}"
+          Margin="0,2,0,4">
+                                                        <TextBlock Text="{Binding Name}" 
+               Foreground="{StaticResource TextPrimaryBrush}" 
+               FontSize="12"/>
+                                                    </CheckBox>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Expander>
+                </StackPanel>
+            </Border>
+            <!-- CLOSED THE BORDER HERE -->
+
+            <!-- TRIGGERS ARE NOW DIRECT CHILDREN OF DATA TEMPLATE -->
+            <DataTemplate.Triggers>
+
+                <!-- CASE 1: OVERDUE -->
+                <DataTrigger Binding="{Binding Converter={StaticResource WorkItemStateConverter}}" Value="Overdue">
+                    <Setter TargetName="StatusDot" Property="Fill" Value="{StaticResource StateOverdueDotBrush}"/>
+                    <Setter TargetName="StatusBadge" Property="Background" Value="{StaticResource StateOverdueBgBrush}"/>
+                    <Setter TargetName="StatusText" Property="Foreground" Value="{StaticResource StateOverdueTextBrush}"/>
+                    <Setter TargetName="StatusText" Property="Text" Value="Overdue"/>
+                </DataTrigger>
+
+                <!-- CASE 2: NOT STARTED -->
+                <DataTrigger Binding="{Binding Converter={StaticResource WorkItemStateConverter}}" Value="NotStarted">
+                    <Setter TargetName="StatusDot" Property="Fill" Value="{StaticResource StateNotStartedDotBrush}"/>
+                    <Setter TargetName="StatusBadge" Property="Background" Value="{StaticResource StateNotStartedBgBrush}"/>
+                    <Setter TargetName="StatusText" Property="Foreground" Value="{StaticResource StateNotStartedTextBrush}"/>
+                    <Setter TargetName="StatusText" Property="Text" Value="not_started"/>
+                </DataTrigger>
+
+                <!-- CASE 3: COMPLETED -->
+                <DataTrigger Binding="{Binding Converter={StaticResource WorkItemStateConverter}}" Value="Completed">
+                    <Setter TargetName="StatusDot" Property="Fill" Value="{StaticResource StatusCompletedBrush}"/>
+                    <Setter TargetName="StatusBadge" Property="Background" Value="{StaticResource StatusCompletedBrush}"/>
+                    <Setter TargetName="StatusText" Property="Foreground" Value="White"/>
+                    <Setter TargetName="StatusText" Property="Text" Value="Complete"/>
+                    <Setter TargetName="StatusBadge" Property="Opacity" Value="0.8"/>
+                </DataTrigger>
+
+            </DataTemplate.Triggers>
+
+        </DataTemplate>
+        
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="Auto"/> <!-- Welcome -->
+            <RowDefinition Height="*"/>    <!-- Content -->
+        </Grid.RowDefinitions>
+
+        <!-- 1. Developer Header -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Branding -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="MISSION RESOURCE" FontWeight="Bold" FontSize="16" Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <Border Background="{StaticResource TacticalGoldBrush}" CornerRadius="4" Padding="8,2" Margin="15,0,0,0">
+                        <TextBlock Text="Developer Portal" Foreground="{StaticResource TextInverseBrush}" FontWeight="Bold" FontSize="11"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- User & Actions -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Switch User Button -->
+                    <Button Command="{Binding SwitchUserCommand}" Content="Switch User" Style="{StaticResource BtnOutline}" Margin="10,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 2. Welcome Section -->
+        <StackPanel Grid.Row="1" Margin="24,24,24,12">
+            <TextBlock Text="{Binding WelcomeMessage}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+            <TextBlock Text="Your assignments and tasks at a glance" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- 3. Main Content Grid -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+             <Grid Margin="24,0,24,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/> <!-- Assignments -->
+                    <ColumnDefinition Width="24"/> <!-- Gutter -->
+                    <ColumnDefinition Width="1*"/> <!-- Quick Tasks -->
+                </Grid.ColumnDefinitions>
+
+                <!-- LEFT: Assignments Accordion -->
+                <StackPanel Grid.Column="0">
+                    <!-- 1. Header with Count (My Assignments (23)) -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                        <Image Source="{StaticResource Icon_Projects}" 
+               Width="20" Height="20" 
+               Stretch="Uniform" Margin="0,2,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="My Assignments" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding TotalAssignments, StringFormat={}({0})}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- 2. SYSTEM LEVEL (Top Level Accordion) -->
+                    <ItemsControl ItemsSource="{Binding AssignmentGroups}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Expander Style="{StaticResource ModernExpanderStyle}"
+                                           IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+                                    <!-- System Header -->
+                                    <Expander.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding SystemName}" FontWeight="SemiBold" FontSize="14" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                                            <Border Background="{StaticResource QuickTasks_BadgeBrush}" CornerRadius="10" Padding="10,2" Margin="12,0,0,0" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding DisplayCount, StringFormat={}{0} items}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" FontWeight="Medium"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Expander.Header>
+
+                                    <!-- 3. PROJECT LEVEL (Nested Accordion) -->
+                                    <!-- This appears when the System is expanded -->
+                                    <ItemsControl ItemsSource="{Binding Projects}" Margin="0,4,0,16">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Expander Style="{StaticResource ModernExpanderStyle}" 
+                                                          IsExpanded="{Binding IsExpanded, Mode=TwoWay}"
+                                                          Margin="24,0,0,0">
+                                                    <!-- Indented -->
+                                                    <Expander.Header>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding ProjectName}" 
+                                                       Foreground="{StaticResource TextPrimaryBrush}" 
+                                                       FontSize="13" FontWeight="Bold"/>
+                                                            <!-- The PRJ-001 ID Code -->
+                                                            <TextBlock Text="{Binding ProjectNumber}" 
+                                                       Foreground="{StaticResource TextSecondaryBrush}" 
+                                                       FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                    </Expander.Header>
+
+                                                    <!-- 4. CARD LEVEL (WorkItems) -->
+                                                    <!-- This appears when the Project is expanded -->
+                                                    <ItemsControl ItemsSource="{Binding Assignments}" 
+                                                  ItemTemplate="{StaticResource AssignmentCardTemplate}"
+                                                  Margin="24,12,0,0"/>
+                                                </Expander>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- RIGHT: Quick Tasks -->
+                <StackPanel Grid.Column="2" VerticalAlignment="Top">
+
+                    <!-- Section Title -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16" VerticalAlignment="Center">
+                        <Path Data="{StaticResource Icon_Clipboard_Outline}"
+              Fill="{StaticResource TextPrimaryBrush}" 
+              Width="18" Height="18" 
+              Stretch="Uniform" 
+              Margin="0,0,10,0" 
+              VerticalAlignment="Center"/>
+                        <TextBlock Text="My Quick Tasks" 
+                   FontSize="16" 
+                   FontWeight="SemiBold" 
+                   Foreground="{StaticResource TextPrimaryBrush}" 
+                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Main Container Card -->
+                    <Border Background="{StaticResource QuickTasks_ContainerBrush}" 
+            CornerRadius="8" 
+            BorderBrush="{StaticResource QuickTasks_BorderBrush}" 
+            BorderThickness="1" 
+            Padding="20">
+
+                        <StackPanel>
+                            <!-- RESOURCES: Define the Task Item Template once to reuse it -->
+                            <StackPanel.Resources>
+                                <DataTemplate x:Key="QuickTaskItemTemplate">
+                                    <Button Command="{Binding DataContext.ToggleQuickTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                            CommandParameter="{Binding}"
+                            HorizontalContentAlignment="Stretch" 
+                            Margin="0,0,0,8"
+                            Cursor="Hand">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <ContentPresenter/>
+                                            </ControlTemplate>
+                                        </Button.Template>
+
+                                        <Border x:Name="CardBorder"
+                                Background="{StaticResource QuickTasks_ItemBrush}" 
+                                BorderBrush="{StaticResource QuickTasks_BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6" 
+                                Padding="16,14">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- ICON: Changes based on State -->
+                                                <Path x:Name="StatusIcon"
+                                      Data="{StaticResource Icon_Checkbox_EmptyCircle}"
+                                      Fill="{StaticResource QuickTasks_BorderBrush}"
+                                      Width="18" Height="18"
+                                      Stretch="Uniform"
+                                      Margin="0,3,14,0"
+                                      VerticalAlignment="Top"/>
+
+                                                <!-- TEXT CONTENT -->
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock x:Name="TaskTitle"
+                                               Text="{Binding Name}" 
+                                               Foreground="{StaticResource TextPrimaryBrush}" 
+                                               FontWeight="SemiBold" 
+                                               FontSize="14" 
+                                               LineHeight="20"
+                                               TextWrapping="Wrap"/>
+
+                                                    <TextBlock x:Name="TaskDesc"
+                                               Text="{Binding Description}" 
+                                               Foreground="{StaticResource TextSecondaryBrush}" 
+                                               FontSize="12" 
+                                               Margin="0,2,0,0" 
+                                               TextWrapping="Wrap"/>
+
+                                                    <TextBlock x:Name="TaskFooter"
+                                               Text="{Binding AssignedUserName, StringFormat='from {0}'}" 
+                                               Foreground="{StaticResource TextSecondaryBrush}" 
+                                               FontSize="11" 
+                                               Opacity="0.6"
+                                               Margin="0,6,0,0"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- TRIGGERS for Completed Styling -->
+                                        <Button.Triggers>
+                                            <EventTrigger RoutedEvent="Loaded">
+                                                <BeginStoryboard>
+                                                    <Storyboard/>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Button.Triggers>
+                                    </Button>
+
+                                    <DataTemplate.Triggers>
+                                        <!-- Hover Effect -->
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="CardBorder" Property="BorderBrush" Value="{StaticResource TextSecondaryBrush}"/>
+                                        </Trigger>
+
+                                        <!-- Completed State Styling -->
+                                        <DataTrigger Binding="{Binding Status, Converter={StaticResource StatusToBoolConverter}}" Value="True">
+                                            <Setter TargetName="StatusIcon" Property="Data" Value="{StaticResource Icon_CheckCircle_Filled}"/>
+                                            <Setter TargetName="StatusIcon" Property="Fill" Value="{StaticResource StatusCompletedBrush}"/>
+                                            <Setter TargetName="TaskTitle" Property="TextDecorations" Value="Strikethrough"/>
+                                            <Setter TargetName="TaskTitle" Property="Opacity" Value="0.5"/>
+                                            <Setter TargetName="TaskDesc" Property="Opacity" Value="0.5"/>
+                                            <Setter TargetName="TaskFooter" Property="Opacity" Value="0.4"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </StackPanel.Resources>
+
+
+                            <!-- ============================================= -->
+                            <!-- SECTION 1: PENDING TASKS                      -->
+                            <!-- ============================================= -->
+                            <StackPanel x:Name="PendingSection">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <!-- Hide entire section if count is 0 -->
+                                            <DataTrigger Binding="{Binding PendingTasksCount}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+
+                                <!-- Pending Header (Yellow/Gold) -->
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <Path Data="{StaticResource Icon_Clock_Outline}" Fill="{StaticResource StatusPendingBrush}" Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="PENDING" FontSize="11" FontWeight="Bold" Foreground="{StaticResource StatusPendingBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <Border Background="{StaticResource QuickTasks_BadgeBackground}" CornerRadius="9" Height="18" MinWidth="24" Padding="6,0">
+                                        <TextBlock Text="{Binding PendingTasksCount}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- List of Pending Tasks -->
+                                <ItemsControl ItemsSource="{Binding PendingQuickTasks}" 
+                              ItemTemplate="{StaticResource QuickTaskItemTemplate}" 
+                              Margin="0,0,0,8"/>
+                            </StackPanel>
+
+
+                            <!-- ============================================= -->
+                            <!-- SECTION 2: COMPLETED TASKS                    -->
+                            <!-- ============================================= -->
+                            <StackPanel x:Name="CompletedSection">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <!-- Add top margin only if Pending tasks exist above it -->
+                                        <Setter Property="Margin" Value="0,16,0,0"/>
+                                        <Style.Triggers>
+                                            <!-- Hide section if count is 0 -->
+                                            <DataTrigger Binding="{Binding CompletedTasksCount}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                            <!-- Remove top margin if Pending section is empty (so it sits at the top) -->
+                                            <DataTrigger Binding="{Binding PendingTasksCount}" Value="0">
+                                                <Setter Property="Margin" Value="0,0,0,0"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+
+                                <!-- Completed Header (Green) -->
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <Path Data="{StaticResource Icon_CheckCircle_Filled}" Fill="{StaticResource StatusCompletedBrush}" Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="COMPLETED" FontSize="11" FontWeight="Bold" Foreground="{StaticResource StatusCompletedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <Border Background="{StaticResource QuickTasks_BadgeBackground}" CornerRadius="9" Height="18" MinWidth="24" Padding="6,0">
+                                        <TextBlock Text="{Binding CompletedTasksCount}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- List of Completed Tasks -->
+                                <ItemsControl ItemsSource="{Binding CompletedQuickTasks}" 
+                              ItemTemplate="{StaticResource QuickTaskItemTemplate}"/>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

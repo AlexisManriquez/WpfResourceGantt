@@ -1,0 +1,476 @@
+<UserControl x:Class="WpfResourceGantt.ProjectManagement.Features.Dashboard.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfResourceGantt.ProjectManagement"
+             xmlns:cv="clr-namespace:WpfResourceGantt.ProjectManagement.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="1200"
+             x:Name="DashboardViewRoot"
+             Background="{StaticResource AppBackgroundBrush}">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <!-- Stat Card Style -->
+        <Style x:Key="StatCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,0,20,0"/>
+            <Setter Property="Padding" Value="20"/>
+        </Style>
+
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="30" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="Border" 
+                        Grid.ColumnSpan="2"
+                        CornerRadius="8"
+                        Background="{StaticResource SurfaceBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1" />
+                <Path x:Name="Arrow"
+                      Grid.Column="1"
+                      Fill="{StaticResource TacticalTextMutedBrush}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Data="M 0 0 L 4 4 L 8 0 Z"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="ToggleButton.IsMouseOver" Value="true">
+                    <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource TacticalGoldBrush}" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style x:Key="ModernComboBoxStyle" TargetType="{x:Type ComboBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton Name="ToggleButton" 
+                                          Template="{StaticResource ComboBoxToggleButton}" 
+                                          Grid.Column="2" 
+                                          Focusable="false"
+                                          IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press"/>
+                            <ContentPresenter Name="ContentSite"
+                                              IsHitTestVisible="False" 
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              Margin="15,0,30,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left" />
+                            <Popup Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True" 
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Grid Name="DropDown"
+                                      SnapsToDevicePixels="True"
+                                      MinWidth="{TemplateBinding ActualWidth}"
+                                      MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Name="DropDownBorder"
+                                            Background="{StaticResource SurfaceBrush}"
+                                            BorderThickness="1"
+                                            BorderBrush="{StaticResource BorderBrush}"
+                                            CornerRadius="8"
+                                            Margin="0,4,0,0">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
+                                        </Border.Effect>
+                                        <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Pill Button Style -->
+        <Style x:Key="FilterPillStyle" TargetType="RadioButton">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="border" Background="{StaticResource AppBackgroundBrush}" CornerRadius="18" Padding="16,6" Margin="0,0,8,0" Cursor="Hand">
+                            <TextBlock x:Name="text" Text="{TemplateBinding Content}" FontWeight="SemiBold" Foreground="{StaticResource TacticalTextMutedBrush}" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource TacticalGoldBrush}"/> <!-- Gold active state -->
+                                <Setter TargetName="text" Property="Foreground" Value="{StaticResource TacticalTextInverseBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Project Card Style -->
+        <Style x:Key="ProjectCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,0,20,20"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Width" Value="350"/> <!-- Fixed width for grid look -->
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AppBackgroundBrush}"/>
+                    <!-- Slight hover effect -->
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Stat Cards -->
+            <RowDefinition Height="Auto"/> <!-- Filters -->
+            <RowDefinition Height="*"/>    <!-- Content -->
+        </Grid.RowDefinitions>
+
+        <!-- 1. Summary Bar (Stat Cards) -->
+        <Grid Grid.Row="0" Margin="0,0,0,30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Breadcrumb/Back -->
+                <RowDefinition Height="Auto"/>
+                <!-- Cards -->
+            </Grid.RowDefinitions>
+
+            <!-- Navigation Header -->
+            <Grid Grid.Row="0" Margin="0,0,0,15">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Back Button -->
+                    <Button Command="{Binding GoBackCommand}" 
+                    Visibility="{Binding CanGoBack, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Background="Transparent" BorderThickness="0" Margin="0,0,10,0" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="←" FontSize="18" FontWeight="Bold" Margin="0,0,5,0" Foreground="{StaticResource TacticalGoldBrush}"/>
+                            <TextBlock Text="Back" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Current View Title -->
+                    <TextBlock Text="{Binding CurrentViewTitle}" 
+                       FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" 
+                       VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Card 1: Total Projects -->
+                <Border Grid.Column="0" Style="{StaticResource StatCardStyle}">
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="Total Projects" Foreground="{StaticResource TacticalTextMutedBrush}" FontSize="14"/>
+                            <TextBlock Text="{Binding TotalProjects}" FontWeight="Bold" FontSize="28" Margin="0,5,0,0" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </StackPanel>
+                        <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="{StaticResource AppBackgroundBrush}" CornerRadius="8" Width="40" Height="40">
+                            <TextBlock Text="☰" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource TacticalGoldBrush}" FontSize="18"/>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Card 2: On Track -->
+                <Border Grid.Column="1" Style="{StaticResource StatCardStyle}">
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="On Track" Foreground="{StaticResource TacticalTextMutedBrush}" FontSize="14"/>
+                            <TextBlock Text="{Binding OnTrackProjects}" FontWeight="Bold" FontSize="28" Margin="0,5,0,0" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </StackPanel>
+                        <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="{StaticResource StatusAvailableLightBrush}" CornerRadius="8" Width="40" Height="40">
+                            <TextBlock Text="✓" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource StatusAvailableBrush}" FontSize="18" FontWeight="Bold"/>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Card 3: At Risk -->
+                <Border Grid.Column="2" Style="{StaticResource StatCardStyle}">
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="At Risk" Foreground="{StaticResource TacticalTextMutedBrush}" FontSize="14"/>
+                            <TextBlock Text="{Binding AtRiskProjects}" FontWeight="Bold" FontSize="28" Margin="0,5,0,0" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </StackPanel>
+                        <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="{StaticResource StatusUnassignedLightBrush}" CornerRadius="8" Width="40" Height="40">
+                            <TextBlock Text="⚠" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource StatusUnassignedBrush}" FontSize="18"/>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Card 4: Off Track -->
+                <Border Grid.Column="3" Style="{StaticResource StatCardStyle}" Margin="0">
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="Off Track" Foreground="{StaticResource TacticalTextMutedBrush}" FontSize="14"/>
+                            <TextBlock Text="{Binding OffTrackProjects}" FontWeight="Bold" FontSize="28" Margin="0,5,0,0" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </StackPanel>
+                        <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="{StaticResource StatusBusyLightBrush}" CornerRadius="8" Width="40" Height="40">
+                            <TextBlock Text="✕" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource StatusBusyBrush}" FontSize="16" FontWeight="Bold"/>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+        <!-- 2. Controls and Filters -->
+        <Grid Grid.Row="1" Margin="0,0,0,30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/> <!-- Dropdown -->
+                <ColumnDefinition Width="Auto"/> <!-- Pills -->
+                <ColumnDefinition Width="*"/>    <!-- Spacer -->
+                <ColumnDefinition Width="300"/>  <!-- Search -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Dropdown -->
+            <ComboBox Grid.Column="0" Width="150" SelectedIndex="0" Margin="0,0,20,0" Style="{StaticResource ModernComboBoxStyle}">
+                <ComboBoxItem Content="All Sections"/>
+                <ComboBoxItem Content="Section A"/>
+                <ComboBoxItem Content="Section B"/>
+            </ComboBox>
+
+            <!-- Pill Buttons -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <RadioButton Content="All" GroupName="StatusFilter" IsChecked="True" Style="{StaticResource FilterPillStyle}"/>
+                <RadioButton Content="On Track" GroupName="StatusFilter" Style="{StaticResource FilterPillStyle}"/>
+                <RadioButton Content="At Risk" GroupName="StatusFilter" Style="{StaticResource FilterPillStyle}"/>
+                <RadioButton Content="Off Track" GroupName="StatusFilter" Style="{StaticResource FilterPillStyle}"/>
+            </StackPanel>
+
+            <!-- Search Bar -->
+            <Border Grid.Column="3" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="10,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="🔍" Foreground="{StaticResource TacticalGoldBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <TextBox Text="Search for a project..." BorderThickness="0" Background="Transparent" Foreground="{StaticResource TacticalTextMutedBrush}" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled">
+            <!-- Wrapped in a ListBox to enable Virtualization automatically -->
+            <ListBox ItemsSource="{Binding ProjectRows}" 
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     BorderThickness="0" 
+                     Background="Transparent"
+                     Padding="0">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <ContentPresenter />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <!-- ROW CONTROL: A horizontal StackPanel of cards -->
+                        <ItemsControl ItemsSource="{Binding Cards}">
+                             <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource ProjectCardStyle}">
+                                        <Border.Resources>
+                                            <cv:BindingProxy x:Key="ProjectProxy" Data="{Binding}"/>
+                                        </Border.Resources>
+                                        <!-- Need to find DashboardVM which is Grandparent now
+                                             Hierarchy: Border -> ContentPresenter -> StackPanel (Row) -> ContentPresenter -> ListBoxItem -> VirtualizingStackPanel -> ListBox -> DashboardView
+                                             
+                                             Safest is AncestorType=UserControl 
+                                        -->
+                                        <Border.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" 
+                                      Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      CommandParameter="{Binding Id}"/>
+                                        </Border.InputBindings>
+                                        
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/> <!-- Header -->
+                                                <RowDefinition Height="Auto"/> <!-- Graph -->
+                                                <RowDefinition Height="Auto"/> <!-- Footer -->
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Card Header -->
+                                            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                <TextBlock Text="{Binding WbsDisplayValue}" Foreground="{StaticResource TacticalTextMutedBrush}" FontSize="12" Margin="0,2,0,0"/>
+                                            </StackPanel>
+
+                                            <!-- Graph Section -->
+                                            <Grid Grid.Row="1" Height="100" Margin="0,0,0,10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="32"/>
+                                                    <!-- Width for Y-Axis Labels -->
+                                                    <ColumnDefinition Width="*"/>
+                                                    <!-- Graph Area -->
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- 1. Y-Axis Labels -->
+                                                <!-- We set Height=60 to match the graph background and VerticalAlignment=Top 
+                                                     to ensure it aligns with the graph box, not the labels below it. -->
+                                                <Grid Grid.Column="0" Height="60" VerticalAlignment="Top">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*"/>
+                                                        <!-- 100% to 75% -->
+                                                        <RowDefinition Height="*"/>
+                                                        <!-- 75% to 50% -->
+                                                        <RowDefinition Height="*"/>
+                                                        <!-- 50% to 25% -->
+                                                        <RowDefinition Height="*"/>
+                                                        <!-- 25% to 0% -->
+                                                    </Grid.RowDefinitions>
+
+                                                    <!-- We use VerticalAlignment="Top" with a small negative margin 
+                                                         to center the text on the line. -->
+                                                    <TextBlock Text="100%" Grid.Row="0" VerticalAlignment="Top" Margin="0,-7,0,0" FontSize="9" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                                                    <TextBlock Text="75%"  Grid.Row="1" VerticalAlignment="Top" Margin="0,-7,0,0" FontSize="9" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                                                    <TextBlock Text="50%"  Grid.Row="2" VerticalAlignment="Top" Margin="0,-7,0,0" FontSize="9" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                                                    <TextBlock Text="25%"  Grid.Row="3" VerticalAlignment="Top" Margin="0,-7,0,0" FontSize="9" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                                                    <TextBlock Text="0%"   Grid.Row="3" VerticalAlignment="Bottom" Margin="0,0,0,-7" FontSize="9" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                                                </Grid>
+
+                                                <!-- 2. Graph Area -->
+                                                <Grid Grid.Column="1">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="60"/>
+                                                        <!-- This matches the Height=60 for labels above -->
+                                                        <RowDefinition Height="Auto"/>
+                                                        <!-- Area for X-axis dates -->
+                                                    </Grid.RowDefinitions>
+
+                                                    <!-- Background Grid Lines & Polyline Lines -->
+                                                    <Grid Grid.Row="0">
+                                                        <!-- Background Lines -->
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="*"/>
+                                                            </Grid.RowDefinitions>
+                                                            <Border Grid.Row="0" BorderBrush="{StaticResource DividerBrush}" BorderThickness="1,1,0,0"/>
+                                                            <Border Grid.Row="1" BorderBrush="{StaticResource DividerBrush}" BorderThickness="1,1,0,0"/>
+                                                            <Border Grid.Row="2" BorderBrush="{StaticResource DividerBrush}" BorderThickness="1,1,0,0"/>
+                                                            <Border Grid.Row="3" BorderBrush="{StaticResource DividerBrush}" BorderThickness="1,0,0,1"/>
+                                                        </Grid>
+
+                                                        <!-- Chart Lines -->
+                                                        <Canvas x:Name="GraphCanvas" Width="280" Height="60" ClipToBounds="True">
+                                                            <Polyline Points="{Binding ExpectedPoints}" 
+                                                      Stroke="{StaticResource TextSecondaryBrush}" 
+                                                      StrokeThickness="2" 
+                                                      StrokeDashArray="4 2"/>
+                                                            <Polyline Points="{Binding ActualPoints}" 
+                                                      Stroke="{StaticResource TacticalGoldBrush}" 
+                                                      StrokeThickness="2"/>
+                                                        </Canvas>
+                                                    </Grid>
+
+                                                    <!-- Dynamic X-Axis Labels -->
+                                                    <ItemsControl Grid.Row="1" ItemsSource="{Binding XAxisLabels}" Margin="0,5,0,0">
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <Canvas Width="280" Height="20"/>
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <TextBlock Text="{Binding Text}" FontSize="9" Foreground="{StaticResource TextSecondaryBrush}">
+                                                                    <TextBlock.Resources>
+                                                                        <cv:BindingProxy x:Key="LabelProxy" Data="{Binding}"/>
+                                                                    </TextBlock.Resources>
+                                                                    <TextBlock.RenderTransform>
+                                                                        <TranslateTransform X="{Binding Data.XOffset, Source={StaticResource LabelProxy}}" Y="0"/>
+                                                                    </TextBlock.RenderTransform>
+                                                                </TextBlock>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </Grid>
+                                            </Grid>
+                                            <!-- Card Footer (Legend & Status) -->
+                                            <Grid Grid.Row="2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Legend -->
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <Rectangle Width="10" Height="2" Fill="{StaticResource TextSecondaryBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="Expected" FontSize="11" Foreground="{StaticResource TacticalTextMutedBrush}" Margin="0,0,12,0"/>
+                                                    
+                                                    <Rectangle Width="10" Height="2" Fill="{StaticResource TacticalGoldBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="Actual" FontSize="11" Foreground="{StaticResource TacticalTextMutedBrush}"/>
+                                                </StackPanel>
+
+                                                <!-- Behind/Ahead Text -->
+                                                <TextBlock Grid.Column="1" 
+                                                           Text="{Binding BehindAheadText}" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="12"
+                                                           VerticalAlignment="Center">
+                                                    <TextBlock.Foreground>
+                                                        <SolidColorBrush Color="{Binding Data.StatusTextColor, Source={StaticResource ProjectProxy}}"/>
+                                                    </TextBlock.Foreground>
+                                                </TextBlock>
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

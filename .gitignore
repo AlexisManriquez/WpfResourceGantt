@@ -1,0 +1,22 @@
+## [Visual Studio]
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## [Build Results]
+[Bb]in/
+[Obj]/
+_ReSharper*/
+
+## [NuGet]
+packages/
+*.nupkg
+*.snupkg
+
+## [Other]
+.DS_Store
+*.log
+*.tmp
+*.bak

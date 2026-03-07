@@ -1,0 +1,354 @@
+<UserControl x:Class="WpfResourceGantt.ProjectManagement.ProjectManagementControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:WpfResourceGantt.ProjectManagement"
+             xmlns:gantt="clr-namespace:WpfResourceGantt.ProjectManagement.Features.Gantt"
+             xmlns:resgantt="clr-namespace:WpfResourceGantt.ProjectManagement.Features.ResourceGantt"
+             xmlns:analytics="clr-namespace:WpfResourceGantt.ProjectManagement.Features.Analytics"
+             xmlns:dashboard="clr-namespace:WpfResourceGantt.ProjectManagement.Features.Dashboard"
+             xmlns:user="clr-namespace:WpfResourceGantt.ProjectManagement.Features.UserManagement"
+            xmlns:tempdial="clr-namespace:WpfResourceGantt.ProjectManagement.Features.ApplyTemplate"
+             xmlns:evm="clr-namespace:WpfResourceGantt.ProjectManagement.Features.EVM"
+             xmlns:sysman="clr-namespace:WpfResourceGantt.ProjectManagement.Features.SystemManagement"
+             xmlns:quick="clr-namespace:WpfResourceGantt.ProjectManagement.Features.QuickTasks"
+             xmlns:dialogs="clr-namespace:WpfResourceGantt.ProjectManagement.Features.Dialogs"
+             xmlns:assign="clr-namespace:WpfResourceGantt.ProjectManagement.Features.AssignDeveloper"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="UI/Styles/Icons.xaml"/>
+                <ResourceDictionary Source="UI/Styles/CoreStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <!-- ViewModel to View DataTemplate mappings (inline for reliability) -->
+            <DataTemplate DataType="{x:Type gantt:GanttViewModel}">
+                <gantt:GanttView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type gantt:GateProgressViewModel}">
+                <gantt:GateProgressView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type dashboard:DashboardViewModel}">
+                <dashboard:DashboardView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type user:UserManagementViewModel}">
+                <user:UserManagementView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type evm:EVMViewModel}">
+                <evm:EVMView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type sysman:SystemManagementViewModel}">
+                <sysman:SystemManagementView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type resgantt:ResourceGanttViewModel}">
+                <resgantt:ResourceGanttView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type analytics:AnalyticsViewModel}">
+                <analytics:AnalyticsView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type assign:AssignDeveloperViewModel}">
+                <assign:AssignDeveloperDialog />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type quick:QuickTasksViewModel}">
+                <quick:QuickTasksView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type tempdial:ApplyTemplateDialogViewModel}">
+                <tempdial:ApplyTemplateDialogView />
+            </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type dialogs:ReconstructProjectDialogViewModel}">
+                <dialogs:ReconstructProjectDialogView />
+            </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type dialogs:ImportTestBlocksDialogViewModel}">
+                <dialogs:ImportTestBlocksDialog />
+            </DataTemplate>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <Style x:Key="FilterPillStyle" TargetType="RadioButton">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Border x:Name="border" Background="Transparent" CornerRadius="4" Padding="12,6" Cursor="Hand">
+                                <TextBlock x:Name="text" Text="{TemplateBinding Content}" FontWeight="SemiBold" Foreground="{StaticResource TacticalTextMutedBrush}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="{StaticResource TacticalGoldBrush}"/>
+                                    <Setter TargetName="text" Property="Foreground" Value="{StaticResource TacticalTextInverseBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="text" Property="Foreground" Value="{StaticResource TacticalTextPrimaryBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid x:Name="MainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{StaticResource TacticalRibbonBackgroundBrush}" BorderBrush="{StaticResource TacticalSeparatorBrush}" BorderThickness="0,0,0,1" Height="95">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <!-- Column 0 is now the main toolbar -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- Column 1 is for global actions like Refresh -->
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+
+                    <!-- GROUP: EDITING (Systems View) -->
+                    <Grid Visibility="{Binding IsSystemsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0">
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" 
+                                    Content="ADD&#x0a;SYSTEM" 
+                                    Tag="{StaticResource Icon_AddSystem_Custom}" 
+                                    Command="{Binding CreateSystemCommand}"/>
+
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" 
+                                    Content="ADD&#x0a;PROJECT" 
+                                    Tag="{StaticResource Icon_AddProject_Custom}" 
+                                    Command="{Binding SystemManagementContext.AddProjectCommand}"/>
+
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" 
+                                    Content="ADD&#x0a;SUBPROJECT" 
+                                    Tag="{StaticResource Icon_AddSubProject_Custom}" 
+                                    Command="{Binding SystemManagementContext.AddSubProjectCommand}"/>
+
+                            <Rectangle Style="{StaticResource TacticalSeparatorStyle}"/>
+                            <StackPanel VerticalAlignment="Center" Margin="5,0">
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" Content="Apply WBS Template" Tag="{StaticResource Icon_Import}" Command="{Binding SystemManagementContext.ApplyTemplateCommand}"/>
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" Content="Gate Progress" Tag="{StaticResource Icon_Analytics}" Command="{Binding SystemManagementContext.EditDetailsCommand}"/>
+
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" 
+                                        Content="Add WBS" 
+                                        Tag="{StaticResource Icon_AddGate_Custom}" 
+                                        Command="{Binding SystemManagementContext.AddWbsCommand}"/>
+
+
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" Content="Delete Item" Tag="{StaticResource Icon_Delete}" Command="{Binding SystemManagementContext.DeleteCommand}"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="EDITING" Style="{StaticResource TacticalCategoryLabelStyle}"/>
+                    </Grid>
+                    <!-- ADD THIS NEW GROUP: BASELINE (Systems View) -->
+                    <Grid Visibility="{Binding IsSystemsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0">
+                            <Rectangle Style="{StaticResource TacticalSeparatorStyle}"/>
+
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" 
+                                    Content="SET&#x0a;BASELINE" 
+                                    Tag="{StaticResource Icon_AssignTask}" 
+                                    Command="{Binding SystemManagementContext.BaselineCommand}"/>
+
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" 
+                                    Content="REBASE-&#x0a;LINE" 
+                                    Tag="{StaticResource Icon_Refresh}" 
+                                    Command="{Binding SystemManagementContext.RebaselineCommand}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="BASELINE" Style="{StaticResource TacticalCategoryLabelStyle}"/>
+                    </Grid>
+                    <!-- GROUP: RANGE (Resource Gantt & Analytics) -->
+                    <Grid Visibility="{Binding IsRangeSectionVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" VerticalAlignment="Center" Margin="10,0">
+                            <RadioButton Content="30D" Style="{StaticResource FilterPillStyle}" 
+                                         Command="{Binding SetTimeRangeCommand}" CommandParameter="Days30"
+                                         IsChecked="{Binding CurrentTimeRange, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Days30}"/>
+                            <RadioButton Content="60D" Style="{StaticResource FilterPillStyle}" 
+                                         Command="{Binding SetTimeRangeCommand}" CommandParameter="Days60"
+                                         IsChecked="{Binding CurrentTimeRange, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Days60}"/>
+                            <RadioButton Content="90D" Style="{StaticResource FilterPillStyle}" 
+                                         Command="{Binding SetTimeRangeCommand}" CommandParameter="Days90"
+                                         IsChecked="{Binding CurrentTimeRange, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Days90}"/>
+                            <RadioButton Content="180D" Style="{StaticResource FilterPillStyle}" 
+                                         Command="{Binding SetTimeRangeCommand}" CommandParameter="Days180"
+                                         IsChecked="{Binding CurrentTimeRange, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Days180}"/>
+                            <RadioButton Content="1YR" Style="{StaticResource FilterPillStyle}" 
+                                         Command="{Binding SetTimeRangeCommand}" CommandParameter="Year1"
+                                         IsChecked="{Binding CurrentTimeRange, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Year1}"/>
+                            <RadioButton Content="3YR" Style="{StaticResource FilterPillStyle}" 
+                                         Command="{Binding SetTimeRangeCommand}" CommandParameter="Year3"
+                                         IsChecked="{Binding CurrentTimeRange, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Year3}"/>
+                            <RadioButton Content="ALL" Style="{StaticResource FilterPillStyle}" 
+                                         Command="{Binding SetTimeRangeCommand}" CommandParameter="All"
+                                         IsChecked="{Binding CurrentTimeRange, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=All}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="RANGE" Style="{StaticResource TacticalCategoryLabelStyle}"/>
+                    </Grid>
+                    
+                    <!-- NEW GROUP: GATE TOOLS (Visible in Gate Progress View) -->
+                    <Grid Visibility="{Binding IsGateProgressVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0">
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" 
+                                    Content="IMPORT&#x0a;TESTS" 
+                                    Tag="{StaticResource Icon_Import}" 
+                                    Command="{Binding ImportTestBlocksCommand}"/>
+
+                            <Rectangle Style="{StaticResource TacticalSeparatorStyle}"/>
+
+                            <StackPanel VerticalAlignment="Center" Margin="5,0">
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" 
+                                        Content="Refresh Gate" 
+                                        Tag="{StaticResource Icon_Refresh}" 
+                                        Command="{Binding RefreshDataCommand}"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="GATE TOOLS" Style="{StaticResource TacticalCategoryLabelStyle}"/>
+                    </Grid>
+
+                    <!-- GROUP: VIEW (Projects View) -->
+                    <Grid Visibility="{Binding IsProjectsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0">
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" Content="EXPAND&#x0a;ALL" Tag="{StaticResource Icon_Expand}" Command="{Binding ExpandAllCommand}"/>
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" Content="COLLAPSE&#x0a;ALL" Tag="{StaticResource Icon_Collapse}" Command="{Binding CollapseAllCommand}"/>
+                            <Rectangle Style="{StaticResource TacticalSeparatorStyle}"/>
+                            <StackPanel VerticalAlignment="Center" Margin="5,0">
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" Content="Zoom In" Tag="{StaticResource Icon_ZoomIn}" Command="{Binding ZoomInCommand}"/>
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" Content="Zoom Out" Tag="{StaticResource Icon_ZoomOut}" Command="{Binding ZoomOutCommand}"/>
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" Content="Reset Zoom" Tag="{StaticResource Icon_ResetZoom}" Command="{Binding ResetZoomCommand}"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="DISPLAY" Style="{StaticResource TacticalCategoryLabelStyle}"/>
+                    </Grid>
+
+                    <!-- GROUP: USER MANAGEMENT (Visible in Users View) -->
+                    <Grid Visibility="{Binding IsUsersVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0">
+                            <!-- FIX: Bind to UserManagementContext directly -->
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" 
+                    Content="ADD&#x0a;USER" Tag="{StaticResource Icon_Users}" 
+                    Command="{Binding UserManagementContext.AddUserCommand}"/>
+
+                            <Rectangle Style="{StaticResource TacticalSeparatorStyle}"/>
+
+                            <StackPanel VerticalAlignment="Center" Margin="5,0">
+                                <!-- FIX: Bind to UserManagementContext directly -->
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" 
+                        Content="Edit User" Tag="{StaticResource Icon_Edit}" 
+                        Command="{Binding UserManagementContext.EditUserCommand}"/>
+
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" 
+                        Content="Delete User" Tag="{StaticResource Icon_Delete}" 
+                        Command="{Binding UserManagementContext.DeleteUserCommand}"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="USERS" Style="{StaticResource TacticalCategoryLabelStyle}"/>
+                    </Grid>
+
+                    <!-- GROUP: DATA (Always) -->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0">
+                            <Rectangle Style="{StaticResource TacticalSeparatorStyle}"/>
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" Content="MPP&#x0a;IMPORT" Tag="{StaticResource Icon_Import}" Command="{Binding ImportProjectCommand}"/>
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" Content="RECONST&#x0a;PROJECT" Tag="{StaticResource Icon_AddProject_Custom}" Command="{Binding ReconstructProjectCommand}"/>
+                            <StackPanel VerticalAlignment="Center" Margin="5,0">
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" Content="Export Project" Tag="{StaticResource Icon_Export}" Command="{Binding ExportProjectCommand}"/>
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" Content="Import Hours" Tag="{StaticResource Icon_Clock}" Command="{Binding ImportHoursCommand}"/>
+                                <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" Content="Export Excel" Tag="{StaticResource Icon_Export}" Command="{Binding ExportToExcelCommand}"/>
+
+                                <Button Tag="{StaticResource Icon_Analytics}" Command="{Binding ToggleEvmModeCommand}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource TacticalRibbonSmallButtonStyle}">
+                                            <Setter Property="Content" Value="EVM: Dollars ($)"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEvmHoursBased}" Value="True">
+                                                    <Setter Property="Content" Value="EVM: Hours (h)"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="DATA TOOLS" Style="{StaticResource TacticalCategoryLabelStyle}"/>
+                    </Grid>
+                </StackPanel>
+
+                <!-- GLOBAL REFRESH -->
+                <Button Grid.Column="2" Style="{StaticResource TacticalRibbonButtonStyle}" Content="REFRESH" Tag="{StaticResource Icon_Refresh}" Command="{Binding RefreshDataCommand}" Margin="0,0,15,0" VerticalAlignment="Top"/>
+            </Grid>
+        </Border>
+        <ContentControl x:Name="ActiveViewHost" Grid.Row="1" Content="{Binding CurrentViewModel}" />
+
+        <!-- Modal Overlay -->
+        <Grid Grid.Row="0" Grid.RowSpan="2" 
+      Visibility="{Binding IsDialogVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+      Panel.ZIndex="1000">
+
+            <!-- Darkened Background -->
+            <Border Background="#AA000000" MouseDown="OnOverlayClick"/>
+
+            <!-- Dialog Container -->
+            <Border Background="{StaticResource SurfaceBrush}" 
+            CornerRadius="12" 
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Center"
+            MinWidth="450" MaxWidth="600"
+            Padding="1">
+                <!-- Border shadow trick -->
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
+                </Border.Effect>
+
+                <ContentControl Content="{Binding CurrentDialogViewModel}">
+                    <ContentControl.Resources>
+                        <!-- This maps the ViewModel to the View -->
+                        <DataTemplate DataType="{x:Type assign:AssignDeveloperViewModel}">
+                            <assign:AssignDeveloperDialog />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type tempdial:ApplyTemplateDialogViewModel}">
+                            <tempdial:ApplyTemplateDialogView />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type dialogs:ExportSystemDialogViewModel}">
+                            <dialogs:ExportSystemDialogView />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type dialogs:SelectSystemDialogViewModel}">
+                            <dialogs:SelectSystemDialogView />
+                        </DataTemplate>
+                    </ContentControl.Resources>
+                </ContentControl>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

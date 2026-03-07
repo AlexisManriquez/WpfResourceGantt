@@ -1,0 +1,102 @@
+<!-- ProjectManagement/Features/Dialogs/SelectSystemDialogView.xaml -->
+<UserControl x:Class="WpfResourceGantt.ProjectManagement.Features.Dialogs.SelectSystemDialogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:conv="clr-namespace:WpfResourceGantt.ProjectManagement.Converters"
+             mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="480">
+    <UserControl.Resources>
+        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </UserControl.Resources>
+
+    <!-- Background and Border matching CreateUserDialog/ImportTestBlocks -->
+    <Border Background="{StaticResource AppBackgroundBrush}" 
+            CornerRadius="12" 
+            BorderBrush="{StaticResource TacticalBorderBrush}" 
+            BorderThickness="1" 
+            Padding="30">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Header -->
+                <RowDefinition Height="Auto"/>
+                <!-- Destination Choice -->
+                <RowDefinition Height="*"/>
+                <!-- Spacer/Content -->
+                <RowDefinition Height="Auto"/>
+                <!-- Buttons -->
+            </Grid.RowDefinitions>
+
+            <!-- Header Pattern from CreateUserDialog -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,25">
+                <TextBlock Text="Import Project Destination" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TacticalGoldBrush}"/>
+                <TextBlock Text="MPP files represent a single project. Choose where to graft this into your hierarchy." 
+                           Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <!-- Destination Logic -->
+            <StackPanel Grid.Row="1">
+                <!-- Option 1: Existing -->
+                <RadioButton x:Name="OptExisting" 
+                             IsChecked="{Binding IsCreateNew, Converter={StaticResource InverseBooleanConverter}, Mode=TwoWay}" 
+                             GroupName="Dest" Margin="0,0,0,10">
+                    <TextBlock Text="Import into Existing System" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </RadioButton>
+
+                <ComboBox ItemsSource="{Binding ExistingSystems}" 
+                          SelectedItem="{Binding SelectedSystem}" 
+                          DisplayMemberPath="Name"
+                          Margin="25,0,0,20"
+                          Height="32"
+                          IsEnabled="{Binding IsChecked, ElementName=OptExisting}"/>
+
+                <!-- Option 2: New -->
+                <RadioButton x:Name="OptNew" 
+                             IsChecked="{Binding IsCreateNew}" 
+                             GroupName="Dest" Margin="0,0,0,10">
+                    <TextBlock Text="Create New System Container" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </RadioButton>
+
+                <Grid Margin="25,0,0,20" IsEnabled="{Binding IsChecked, ElementName=OptNew}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <!-- System Number -->
+                        <ColumnDefinition Width="*"/>
+                        <!-- System Name -->
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Number" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,2"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="System Name" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="5,0,0,2"/>
+
+                    <TextBox Grid.Row="1" Grid.Column="0" 
+             Text="{Binding NewSystemNumber, UpdateSourceTrigger=PropertyChanged}" 
+             Height="32" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+
+                    <TextBox Grid.Row="1" Grid.Column="1" 
+             Text="{Binding NewSystemName, UpdateSourceTrigger=PropertyChanged}" 
+             Margin="5,0,0,0" Height="32" VerticalContentAlignment="Center"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- Action Buttons Pattern from CreateUserDialog -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button Content="Cancel" 
+                        Command="{Binding CancelCommand}"
+                        Style="{StaticResource BtnOutline}" 
+                        Width="100"
+                        Margin="0,0,12,0"/>
+
+                <Button Content="Confirm Import" 
+                        Command="{Binding ConfirmCommand}"
+                        Style="{StaticResource BtnPrimary}" 
+                        Width="130"
+                        IsDefault="True"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

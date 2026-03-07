@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:gantt="clr-namespace:WpfResourceGantt.ProjectManagement.Features.Gantt"
+                    xmlns:dashboard="clr-namespace:WpfResourceGantt.ProjectManagement.Features.Dashboard"
+                    xmlns:user="clr-namespace:WpfResourceGantt.ProjectManagement.Features.UserManagement">
+    
+    <!-- ViewModel to View mapping -->
+    <DataTemplate DataType="{x:Type gantt:GanttViewModel}">
+        <gantt:GanttView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type dashboard:DashboardViewModel}">
+        <dashboard:DashboardView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type user:UserManagementViewModel}">
+        <user:UserManagementView/>
+    </DataTemplate>
+
+
+    <DataTemplate DataType="{x:Type gantt:GateProgressViewModel}">
+        <gantt:GateProgressView />
+    </DataTemplate>
+
+</ResourceDictionary>
