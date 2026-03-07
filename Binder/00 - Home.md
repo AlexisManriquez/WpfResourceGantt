@@ -45,6 +45,8 @@ purpose: Central hub — Map of Content for the entire WpfResourceGantt project.
 - [[Quick Tasks]] — Flat list of ad-hoc administrative tasks
 - [[Project Creation]] — Recursive in-memory WBS builder (pre-commit)
 - [[Apply Template Flow]] — Template selection → overwrite/append → save
+- [[Temporal Sandbox]] — What-if simulation environment for schedule and EVM modeling
+
 
 ## Infrastructure
 - [[MainViewModel]] — Central orchestrator: navigation, dialog system, global state

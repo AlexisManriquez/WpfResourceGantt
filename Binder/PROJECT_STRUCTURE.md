@@ -105,6 +105,8 @@ This document provides a comprehensive reference of the codebase structure, deta
 *   **`GanttViewModel`**: Manages the hierarchical Gantt chart.
     *   `WorkItems`: Flattened list with indentation.
     *   `FilterRecursive()`: Logic for filtering tree structures.
+    *   **Sandbox Mode**: Supports an injected `simulatedData` collection to allow disconnected "What-If" visualization.
+
 *   **`AnimatedGanttBar.xaml` / `.cs`**: Custom UserControl for rendering Gantt bars. Handles task bars (blue/red), summary bars (health-colored with EVM labels), and baseline ghost bars.
 *   **`DependencyArrowCanvas.cs`**: (**New**) Custom Canvas overlay that draws elbow-style FS dependency arrows between predecessor and successor bars. Uses `StreamGeometry` via `OnRender` for performance. Arrows are slate gray (normal) or red (critical path). Refreshes on scroll, expand/collapse, and resize with 50ms debounce.
 
@@ -163,7 +165,13 @@ This document provides a comprehensive reference of the codebase structure, deta
 **Files**: `AssignDeveloperDialog.xaml`, `AssignDeveloperViewModel.cs`
 *   **`AssignDeveloperViewModel`**: Modal logic for assigning users to tasks.
 
-### 14. 📁 Dialogs
+### 14. 📁 Simulation (Temporal Sandbox) — See [[Temporal Sandbox]]
+**Files**: `SimulationViewModel.cs`, `SimulationView.xaml`, `InteractiveManipulatorGraph.xaml`, `SimulationDataPoint.cs`, `CloneHelper.cs`
+*   **`SimulationViewModel`**: Manages the sandbox life-cycle, including project cloning and time-travel recalculations.
+*   **`InteractiveManipulatorGraph`**: High-performance custom control for visual timeline manipulation of progress and hours.
+*   **`CloneHelper`**: Specialized utility for deep-cloning complex task hierarchies while maintaining parent-child links.
+
+### 15. 📁 Dialogs
 **Location**: `ProjectManagement\Features\Dialogs`
 *   Contains shared dialogs for system export, block imports, and project reconstruction.
 *   **Files**: `ExportSystemDialogView.xaml`, `ExportSystemDialogViewModel.cs`, `ImportTestBlocksDialog.xaml`, `ImportTestBlocksDialogViewModel.cs`, `ReconstructProjectDialogView.xaml`, `ReconstructProjectDialogViewModel.cs`.

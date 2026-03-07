@@ -65,6 +65,7 @@ Stored separately from live data to allow reuse without pollution.
 Located at the very top, this ribbon is dedicated to switching the global application state.
 *   **Primary Navigation Group**: DASHBOARD, PROJECTS, RESOURCE GANTT, ANALYTICS, EVM.
 *   **Administration Group**: USERS, SYSTEMS.
+*   **Actions Group**: PLAYGROUND (Simulation).
 *   **Features**: Supports ribbon collapsing (toggled via chevron) to maximize workspace.
 
 ### B. Contextual Action Toolbar (`ProjectManagementControl.xaml`)
@@ -96,6 +97,7 @@ Located immediately below the Navigation Ribbon, this toolbar updates dynamicall
 | **Analytics** | `AnalyticsViewModel.cs` | Visualizes Project Health using `LiveCharts`. |
 | **Assign Developer** | `AssignDeveloperViewModel.cs` | **Dialog View**. Allows a Manager to assign a Developer to a specific Task/Leaf item. |
 | **Reconstruct Project**| `ReconstructProjectDialogViewModel.cs`| **Dialog View**. High-speed pipeline for rebuilding DoD hierarchies from SMTS exports. |
+| **Simulation** | `SimulationViewModel.cs` | **Temporal Sandbox**. Clones the project hierarchy for "what-if" modeling without affecting live data. |
 | **Dialogs** | `ExportSystemDialogViewModel.cs`, `ImportBlocksViewModel.cs` | **Utility Module**. Contains shared dialogs for system export and block imports. |
 
 ---
@@ -253,6 +255,16 @@ This module provides a specialized end-to-end pipeline to reconstruct a full DoD
         *   **Auto-Scanner**: Uses `ScanCsvForNumbers` to pre-fill System/Project numbers from the source file.
         *   **Excel Support**: Leverages background COM Interop (`ConvertExcelToCsv`) to handle `.xlsx` workbooks.
     *   **`CsvImportService.cs`**: The parsing engine (heavily upgraded for hierarchy generation).
+
+#### 3. Temporal Sandbox (Folder: `ProjectManagement/Features/Simulation`)
+This module provides a risk-free environment for schedule and budget modeling.
+*   **Purpose**: Allows users to manipulate task progress and hours to see the resulting impact on Earned Value (SV/CV).
+*   **Key Files**:
+    *   **`SimulationViewModel.cs`**: Orchestrates cloning and time-travel recalculations.
+    *   **`InteractiveManipulatorGraph.xaml.cs`**: Custom WPF control for visual timeline manipulation.
+    *   **`SimulationView.xaml`**: The integrated command-and-control dashboard for simulations.
+    *   **`CloneHelper.cs`**: Utility for deep-cloning complex `WorkItem` hierarchies.
+
 
 
 
