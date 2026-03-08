@@ -20,3 +20,4 @@ packages/
 *.log
 *.tmp
 *.bak
+.agent/

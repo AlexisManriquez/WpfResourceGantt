@@ -75,7 +75,7 @@ namespace WpfResourceGantt.ProjectManagement.Services
                     var deps = PredecessorParser.Parse(item.Predecessors);
                     if (!deps.Any()) continue;
 
-                    DateTime earliestStart = item.StartNoEarlierThan ?? today;
+                    DateTime earliestStart = item.StartNoEarlierThan ?? item.StartDate ?? today;
 
                     foreach (var dep in deps)
                     {
