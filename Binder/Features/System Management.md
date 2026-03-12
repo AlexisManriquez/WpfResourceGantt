@@ -19,17 +19,48 @@ purpose: AI reference for the System Management CRUD view.
 | Add child item | `AddChild` command |
 | Apply template to sub-project | `HandleApplyTemplate` → opens [[Apply Template Flow]] dialog |
 | Edit details | `EditDetails` command |
-| Delete item | `DeleteCommand` |
+| Delete item (with cascade cleanup) | `DeleteCommand`, `ExecuteDeleteSelected` |
 | Copy / Paste | `HandleCopy`, `HandlePaste`, `ExecutePaste` |
 | Expansion state preservation | `RefreshData`, `OnDataChanged` |
 | Schedule Mode Toggle | Dropdown toggle for **Dynamic** vs **Manual** mode directly in the Name column |
 | EVM Mode Awareness | `IsEvmHoursBased` / `EvmDisplayMode` |
+| Assign Developer/PM to project | `AssignDeveloper` command |
+
+## Access Control
+Systems are **pure containers** — they are not assigned to users. Visibility is role-based:
+
+| Role | Systems Seen | Projects Seen |
+|------|-------------|---------------|
+| Admin / FlightChief / SectionChief / TechnicalSpecialist | All | All |
+| ProjectManager | All (as containers) | Only managed projects |
+| Developer | Only relevant | Only assigned branches |
+
+See [[User & Role]] for full access control matrix.
+
+## Deletion Cascade
+When a project or any child is deleted, the following cleanup is performed:
+1. **Collect** all descendant item IDs (recursive)
+2. **Remove** those IDs from all PM users' `ManagedProjectIds`
+3. **Clear** all `ResourceAssignment` entries on the deleted branch
+4. **Clear** all `AssignedDeveloperId` fields on the deleted branch
+5. **Save** to database
+
+Methods involved: `DataService.CollectAllItemIdsRecursive()`, `DataService.CleanupManagedProjectIds()`, `DataService.CleanupAssignmentsOnDelete()`
+
+## PM Assignment Sync
+When a PM is assigned to a Level 1 project via the Assign Developer dialog:
+1. A `ResourceAssignment` is created on the project item
+2. The PM's `User.ManagedProjectIds` is automatically updated to include the project ID
+3. When unassigned, the project ID is removed from `ManagedProjectIds`
+
+This ensures `FilterProjectsForPM()` works correctly via both lookup paths.
 
 ## SystemHierarchyItemViewModel
 Wrapper ViewModel for each tree row with:
 - `IsExpanded` with `ToggleExpansionCommand`
 - Name parsing: auto-numbers for Level 0–2, free-text for Level 3+
 - `ApplyTemplateCommand` for Sub-Project rows
+- System rows (Level 0) display `"--"` for assignee (containers have no owner)
 
 ### Schedule Properties
 | Property | Purpose |
@@ -67,6 +98,7 @@ Key columns in `SystemManagementView.xaml`:
 
 ## Related Pages
 - [[ProjectData & SystemItem]] — SystemItem model
+- [[User & Role]] — role-based access control
 - [[DataService]] — CRUD operations
 - [[Apply Template Flow]] — template application
 - [[TemplateService]] — template conversion

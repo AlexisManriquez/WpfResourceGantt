@@ -10,6 +10,7 @@ namespace WpfResourceGantt.ProjectManagement.Models
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Role
     {
+        Administrator,
         FlightChief,
         SectionChief,
         TechnicalSpecialist,

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="WpfResourceGantt.ProjectManagement.Features.Gantt.GanttView"
+<UserControl x:Class="WpfResourceGantt.ProjectManagement.Features.Gantt.GanttView"
              x:Name="GanttViewRoot"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -678,7 +678,8 @@ Margin="5,0,0,0">
               ScrollViewer.ScrollChanged="GanttTree_ScrollChanged"
               VirtualizingStackPanel.IsVirtualizing="True"
               VirtualizingStackPanel.VirtualizationMode="Recycling"
-              VirtualizingStackPanel.ScrollUnit="Pixel" 
+              VirtualizingStackPanel.ScrollUnit="Pixel"
+                      ScrollViewer.CanContentScroll="True"
           VirtualizingStackPanel.CacheLengthUnit="Page"
           VirtualizingStackPanel.CacheLength="2,2">
 
@@ -906,6 +907,7 @@ Margin="5,0,0,0">
                                         StartDate="{Binding StartDate}"
                                         EndDate="{Binding EndDate}"
                                         IsSummary="{Binding IsSummary}"
+                                        IsMilestone="{Binding IsMilestone}"
                                         IsCritical="{Binding IsCritical}"
                                         ScheduleHealth="{Binding ScheduleHealth}"
                                         IsBaselined="{Binding IsBaselined}"
@@ -1137,7 +1139,7 @@ Margin="5,0,0,0">
                     Grid.Column="2"
                     ClipToBounds="True"
                     IsHitTestVisible="False"
-                    Height="{Binding ActualHeight, ElementName=GanttTree}"
+                                              VerticalAlignment="Stretch"
                     WorkItems="{Binding WorkItems}"
                     TimelineStart="{Binding ProjectStartDate}"
                     TimelineEnd="{Binding ProjectEndDate}"

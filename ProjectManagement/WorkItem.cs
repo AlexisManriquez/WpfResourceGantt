@@ -283,6 +283,7 @@ namespace WpfResourceGantt.ProjectManagement
         public bool IsSummary => Children != null && Children.Count > 0;
         public bool IsLeaf => !IsSummary && ItemType != WorkItemType.System;
         public bool IsSubProject => Level == 2;
+        public bool IsMilestone => ItemType == WorkItemType.Milestone;
 
         public ObservableCollection<ProgressBlock> ProgressBlocks { get; set; } = new ObservableCollection<ProgressBlock>();
         private ObservableCollection<ResourceAssignment> _assignments = new ObservableCollection<ResourceAssignment>();

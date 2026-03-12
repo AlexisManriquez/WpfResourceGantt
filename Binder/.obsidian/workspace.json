@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Features/System Management.md",
+                "file": "Features/Gantt View.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "System Management"
+              "title": "Gantt View"
             }
           },
           {
@@ -199,20 +199,20 @@
   },
   "active": "d80448f7271b103d",
   "lastOpenFiles": [
+    "APP_BREAKDOWN.md",
+    "PROJECT_STRUCTURE.md",
+    "Features/EVM.md",
+    "Features/System Management.md",
     "Services/DataService.md",
     "Features/User Management.md",
     "Architecture/Data Hierarchy.md",
     "Architecture/App Overview.md",
     "Architecture/Common Modifications.md",
-    "Features/EVM.md",
     "Features/Gantt View.md",
-    "Features/System Management.md",
     "Features/Gate Progress.md",
     "Architecture/Navigation & Ribbons.md",
     "Infrastructure/MainViewModel.md",
-    "APP_BREAKDOWN.md",
     "00 - Home.md",
-    "PROJECT_STRUCTURE.md",
     "Architecture/EVM Calculation Rules.md",
     "Services/ScheduleCalculationService.md",
     "Features/Resource Gantt.md",

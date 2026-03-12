@@ -5,7 +5,7 @@ using System.Windows.Input;
 using WpfResourceGantt.ProjectManagement.Models;
 using WpfResourceGantt.ProjectManagement.ViewModels;
 using WpfResourceGantt.ProjectManagement;
-
+using static WpfResourceGantt.ProjectManagement.Models.WorkBreakdownItem;
 namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
 {
     public class SystemHierarchyItemViewModel : ViewModelBase
@@ -41,10 +41,29 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
             { 
                 if (_itemType == value) return;
                 _itemType = value; 
-                OnPropertyChanged(); 
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsMilestone));
+
+                // MILESTONE ENFORCEMENT: When toggled to Milestone, enforce constraints
+                if (IsMilestone)
+                {
+                    _durationDays = 0;
+                    OnPropertyChanged(nameof(DurationDays));
+                    OnPropertyChanged(nameof(DurationDisplay));
+                    if (_endDate.HasValue) { _startDate = _endDate; OnPropertyChanged(nameof(StartDate)); }
+                    else if (_startDate.HasValue) { _endDate = _startDate; OnPropertyChanged(nameof(EndDate)); }
+                    _work = 0;
+                    OnPropertyChanged(nameof(Work));
+                }
+
                 RollupHierarchy();
             }
         }
+
+        /// <summary>
+        /// Quick-access boolean for XAML DataTriggers and data bindings.
+        /// </summary>
+        public bool IsMilestone => ItemType == WorkItemType.Milestone;
 
         private ScheduleMode _scheduleMode;
         public ScheduleMode ScheduleMode
@@ -136,7 +155,12 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 LocalName = fullName;
             }
         }
-
+        private bool _wasJustSaved;
+        public bool WasJustSaved
+        {
+            get => _wasJustSaved;
+            set { _wasJustSaved = value; OnPropertyChanged(); }
+        }
         public bool IsEmptyContainer => (Level == 0 || Level == 1 || Level == 2) && !HasLeafDescendant(this);
 
         private bool HasLeafDescendant(SystemHierarchyItemViewModel node)
@@ -153,14 +177,14 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         private DateTime? _startDate;
         public DateTime? StartDate
         {
-            get => (Level == 0) ? null : _startDate;
+            get => (Level == 0 || IsEmptyContainer) ? null : _startDate;
             set
             {
+                // Only allow setting if it's a leaf node or we are rolling up
                 if (_startDate == value) return;
                 _startDate = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(DurationDisplay));
-
                 UpdateDuration();
                 RollupHierarchy();
             }
@@ -169,7 +193,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         private DateTime? _endDate;
         public DateTime? EndDate
         {
-            get => (Level == 0) ? null : _endDate;
+            get => (Level == 0 || IsEmptyContainer) ? null : _endDate;
             set
             {
                 if (_endDate == value) return;
@@ -202,7 +226,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         private string? _predecessors;
         public string? Predecessors
         {
-            get => IsEmptyContainer ? null : _predecessors;
+            get => (Level == 0 || IsEmptyContainer) ? null : _predecessors;
             set
             {
                 if (_predecessors == value) return;
@@ -331,7 +355,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         private int? _totalFloat;
         public int? TotalFloat
         {
-            get => IsEmptyContainer ? null : _totalFloat;
+            get => (Level == 0 || IsEmptyContainer) ? null : _totalFloat;
             set { _totalFloat = value; OnPropertyChanged(); }
         }
         public double? BurnRate => (Work.HasValue && DurationDays.HasValue && DurationDays.Value > 0)
@@ -348,20 +372,39 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         public bool ShowBurnOptimizer => !IsSummary && Work.HasValue && Work.Value > 0;
         private bool CanOptimizeDuration() => Work.HasValue && Work.Value > 0;
 
-    private void OptimizeDuration()
-    {
-        // GAO-16-89G: Target ~6.5 hours per day. Math.Ceiling ensures we don't exceed it.
-        DurationDays = (int)Math.Ceiling(Work.Value / 6.5);
-        
-        // Notify UI of the updates (assuming your base properties don't already cascade these)
-        OnPropertyChanged(nameof(DurationDays));
-        OnPropertyChanged(nameof(DurationDisplay));
-        OnPropertyChanged(nameof(BurnRate));
-        OnPropertyChanged(nameof(BurnRateDisplay));
-        OnPropertyChanged(nameof(IsOverallocated));
-            RollupHierarchy();
+        private void OptimizeDuration()
+        {
+            if (!Work.HasValue || Work.Value <= 0 || !StartDate.HasValue) return;
 
-            // Note: If you have a Schedule Engine, you may also need to trigger an EndDate recalculation here
+            // 1. Snapshot values so the SaveCommand recognizes a change occurred
+            SnapshotValues();
+
+            // 2. Set the edit flag so the SaveCommand is allowed to run
+            IsEditingDuration = true;
+
+            // 3. GAO-16-89G: Target ~6.5 hours per day. 
+            // We update the backing field directly so we don't trigger 
+            // the setter logic until we are ready.
+            _durationDays = (int)Math.Ceiling(Work.Value / 6.5);
+
+            // 4. FORCE the EndDate calculation immediately so the UI updates
+            // (This uses the logic already in your WorkBreakdownItem class)
+            EndDate = WorkBreakdownItem.AddBusinessDays(StartDate.Value, _durationDays.Value);
+
+            // 5. Notify the UI of all related changes
+            OnPropertyChanged(nameof(DurationDays));
+            OnPropertyChanged(nameof(DurationDisplay));
+            OnPropertyChanged(nameof(BurnRate));
+            OnPropertyChanged(nameof(BurnRateDisplay));
+            OnPropertyChanged(nameof(IsOverallocated));
+
+            // 6. Execute the save
+            // This will trigger the DataService to recalculate the whole project 
+            // branch and persist it to the database.
+            if (SaveCommand.CanExecute(null))
+            {
+                SaveCommand.Execute(null);
+            }
         }
         private double? _work;
         public double? Work
@@ -405,10 +448,11 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         }
 
         private string _assignee;
-        public string Assignee 
-        { 
-            get => _assignee; 
-            set { _assignee = value; OnPropertyChanged(); } 
+        public string Assignee
+        {
+            // CHANGE: Return "--" if it's a System
+            get => (Level == 0) ? "--" : _assignee;
+            set { _assignee = value; OnPropertyChanged(); }
         }
 
         private int _level;
@@ -435,7 +479,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         public bool IsExpanded 
         { 
             get => _isExpanded; 
-            set { _isExpanded = value; OnPropertyChanged(); } 
+            set { _isExpanded = value; OnPropertyChanged(nameof(IsExpanded)); } 
         }
 
         private bool _isSelected;
@@ -450,6 +494,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         public decimal? BACHours => BAC / 195m;
 
         private decimal? _bac;
+        /// <summary>Raw backing value in dollars — used by RollupHierarchy to avoid double-conversion.</summary>
+        internal decimal? RawBac => _bac;
         public decimal? BAC
         {
             get
@@ -470,6 +516,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         }
 
         private double? _bcws;
+        /// <summary>Raw backing value in dollars — used by RollupHierarchy to avoid double-conversion.</summary>
+        internal double? RawBcws => _bcws;
         public double? Bcws
         {
             // FIX: Level 0 (System) never shows metrics.
@@ -478,6 +526,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         }
 
         private double? _bcwp;
+        /// <summary>Raw backing value in dollars — used by RollupHierarchy to avoid double-conversion.</summary>
+        internal double? RawBcwp => _bcwp;
         public double? Bcwp
         {
             // FIX: Level 0 (System) never shows metrics.
@@ -486,6 +536,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         }
 
         private double? _acwp;
+        /// <summary>Raw backing value in dollars — used by RollupHierarchy to avoid double-conversion.</summary>
+        internal double? RawAcwp => _acwp;
         public double? Acwp
         {
             // FIX: Level 0 (System) never shows metrics.
@@ -514,12 +566,15 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
             {
                 if (Children != null && Children.Any())
                 {
-                    // 1. Calculate Min/Max from Children
-                    var validStarts = Children.Where(c => c.StartDate.HasValue).Select(c => c.StartDate.Value).ToList();
-                    var validEnds = Children.Where(c => c.EndDate.HasValue).Select(c => c.EndDate.Value).ToList();
+                    // MILESTONE EXCLUSION: Milestone children are point-in-time markers
+                    // and must not expand parent date bounds or contribute to financial rollup.
+                    var rollupChildren = Children.Where(c => !c.IsMilestone).ToList();
 
-                    // 2. Strict Rollup: Parent takes the exact bounds of children
-                    // (We do not check if 'current' dates are wider anymore)
+                    // 1. Calculate Min/Max from non-milestone Children
+                    var validStarts = rollupChildren.Where(c => c.StartDate.HasValue).Select(c => c.StartDate.Value).ToList();
+                    var validEnds = rollupChildren.Where(c => c.EndDate.HasValue).Select(c => c.EndDate.Value).ToList();
+
+                    // 2. Strict Rollup: Parent takes the exact bounds of non-milestone children
                     if (validStarts.Any())
                     {
                         var minStart = validStarts.Min();
@@ -529,7 +584,11 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                             OnPropertyChanged(nameof(StartDate));
                         }
                     }
-
+                    else
+                    {
+                        _startDate = null;
+                        OnPropertyChanged(nameof(StartDate));
+                    }
                     if (validEnds.Any())
                     {
                         var maxEnd = validEnds.Max();
@@ -539,8 +598,12 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                             OnPropertyChanged(nameof(EndDate));
                         }
                     }
-
-                    // 3. FIX: Calculate Parent Duration based on these new dates
+                    else
+                    {
+                        _endDate = null;
+                        OnPropertyChanged(nameof(EndDate));
+                    }
+                    // 3. Calculate Parent Duration based on these new dates
                     if (_startDate.HasValue && _endDate.HasValue)
                     {
                         _durationDays = WorkBreakdownItem.GetBusinessDaysSpan(_startDate.Value, _endDate.Value);
@@ -551,34 +614,35 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                     }
 
 
-                    var sumWork = Children.Sum(c => c.Work ?? 0);
+                    var sumWork = rollupChildren.Sum(c => c.Work ?? 0);
                     if (_work != sumWork)
                     {
                         _work = sumWork;
                         OnPropertyChanged(nameof(Work));
                     }
-                    var sumActual = Children.Sum(c => c.ActualWork ?? 0);
+                    var sumActual = rollupChildren.Sum(c => c.ActualWork ?? 0);
                     if (_actualWork != sumActual) { _actualWork = sumActual; OnPropertyChanged(nameof(ActualWork)); }
-                    var sumBac = Children.Sum(c => c.BAC ?? 0);
+                    // FIX: Use Raw* backing fields to avoid double-conversion in Hours mode.
+                    var sumBac = rollupChildren.Sum(c => c.RawBac ?? 0);
                     if (_bac != sumBac) { _bac = sumBac; OnPropertyChanged(nameof(BAC)); }
 
-                    var sumBcws = Children.Sum(c => c.Bcws ?? 0);
+                    var sumBcws = rollupChildren.Sum(c => c.RawBcws ?? 0);
                     if (_bcws != sumBcws) { _bcws = sumBcws; OnPropertyChanged(nameof(Bcws)); }
 
-                    var sumBcwp = Children.Sum(c => c.Bcwp ?? 0);
+                    var sumBcwp = rollupChildren.Sum(c => c.RawBcwp ?? 0);
                     if (_bcwp != sumBcwp) { _bcwp = sumBcwp; OnPropertyChanged(nameof(Bcwp)); }
 
-                    var sumAcwp = Children.Sum(c => c.Acwp ?? 0);
+                    var sumAcwp = rollupChildren.Sum(c => c.RawAcwp ?? 0);
                     if (_acwp != sumAcwp) { _acwp = sumAcwp; OnPropertyChanged(nameof(Acwp)); }
 
                     if (sumBac > 0)
                     {
-                        _progress = (double)(sumBcwp / (double)sumBac);
+                        _progress = (double)((double)sumBcwp / (double)sumBac);
                         OnPropertyChanged(nameof(Progress));
                     }
-                    else if (Children.Any())
+                    else if (rollupChildren.Any())
                     {
-                        _progress = Children.Average(c => c.Progress ?? 0);
+                        _progress = rollupChildren.Average(c => c.Progress ?? 0);
                         OnPropertyChanged(nameof(Progress));
                     }
                 }
@@ -591,7 +655,9 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
 
                     if (StartDate.HasValue)
                     {
-                        var expectedEnd = WorkBreakdownItem.AddBusinessDays(StartDate.Value, DurationDays ?? 0);
+                        int duration = DurationDays ?? 1;
+                        var expectedEnd = WorkBreakdownItem.AddBusinessDays(StartDate.Value, duration);
+
                         if (_endDate != expectedEnd)
                         {
                             _endDate = expectedEnd;
@@ -615,10 +681,14 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 OnPropertyChanged(nameof(StartDate));
                 OnPropertyChanged(nameof(EndDate));
 
-                Parent?.RollupHierarchy();
+                if (Parent != null && Level > 0)
+                {
+                    Parent.RollupHierarchy();
+                }
             }
             finally
             {
+                _isRollingUp = false;
                 OnPropertyChanged(nameof(StartDate));
                 OnPropertyChanged(nameof(EndDate));
                 OnPropertyChanged(nameof(DurationDays));
@@ -631,7 +701,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 OnPropertyChanged(nameof(TotalFloat));
                 OnPropertyChanged(nameof(Predecessors));
 
-                _isRollingUp = false;
+                
             }
         }
 
@@ -711,12 +781,20 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 if (Level == 0) return "--";
 
                 if (IsEmptyContainer) return "--";
+
+                // MILESTONE: Show diamond marker instead of duration
+                if (IsMilestone) return "◆ 0d";
+
                 if (DurationDays.HasValue) return $"{DurationDays.Value}d";
                 return "0d";
             }
         }
 
-        public string StatusSummary => Status.ToString();
+        public string StatusSummary
+        {
+            // CHANGE: Return "--" if it's a System
+            get => (Level == 0) ? "--" : _status.ToString();
+        }
 
         public string CurrentNumberPrefix
         {
@@ -762,6 +840,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         private double? _originalWork;
         private WorkItemStatus _originalStatus;
         private WorkItemType _originalType;
+        // Helper to check if we are currently in an edit session
 
         public SystemHierarchyItemViewModel(
             Action<SystemHierarchyItemViewModel> onSave, 
@@ -792,23 +871,24 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
             ToggleExpansionCommand = new RelayCommand(() => IsExpanded = !IsExpanded);
 
             EditNameCommand = new RelayCommand(() => { CancelAllEdits(); SnapshotValues(); IsEditingName = true; });
-            EditStartDateCommand = new RelayCommand(() => 
-            { 
-                if (!IsSummary && ScheduleMode == ScheduleMode.Manual) 
-                { 
-                    CancelAllEdits(); 
-                    SnapshotValues(); 
-                    IsEditingStartDate = true; 
-                } 
+            EditStartDateCommand = new RelayCommand(() =>
+            {
+                // Only allow manual edit for Level 3 and deeper (Leaf items)
+                if (Level >= 3 && !IsSummary && ScheduleMode == ScheduleMode.Manual)
+                {
+                    CancelAllEdits();
+                    SnapshotValues();
+                    IsEditingStartDate = true;
+                }
             });
-            EditEndDateCommand = new RelayCommand(() => 
-            { 
-                if (!IsSummary && ScheduleMode == ScheduleMode.Manual) 
-                { 
-                    CancelAllEdits(); 
-                    SnapshotValues(); 
-                    IsEditingEndDate = true; 
-                } 
+            EditEndDateCommand = new RelayCommand(() =>
+            {
+                if (Level >= 3 && !IsSummary && ScheduleMode == ScheduleMode.Manual)
+                {
+                    CancelAllEdits();
+                    SnapshotValues();
+                    IsEditingEndDate = true;
+                }
             });
             EditDurationCommand = new RelayCommand(() => 
             { 
@@ -832,8 +912,9 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 } 
             });
 
-            SaveCommand = new RelayCommand(() =>
+            SaveCommand = new RelayCommand(async() =>
             {
+                if (!IsAnyEditing) return;
                 if (Level == 0)
                 {
                     _name = $"{LocalNumber} {LocalName}".Trim();
@@ -860,15 +941,19 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 CloseEditMode();
                 RollupHierarchy();
                 _onSave?.Invoke(this);
+                // Provide visual feedback
+                WasJustSaved = true;
+                await Task.Delay(800); // Highlight for 800ms
+                WasJustSaved = false;
             });
-
+            NewChildItemType = WorkItemType.Leaf;
             AddChildCommand = new RelayCommand(() =>
             {
                 CloseEditMode();
                 IsAddingChild = true;
                 IsExpanded = true;
                 NewChildItemType = WorkItemType.Leaf;
-                NewChildStartDate = StartDate ?? DateTime.Today;
+                NewChildStartDate = EnsureBusinessDay(DateTime.Today);
                 NewChildDurationDays = 5;
                 NewChildWork = 40;
                 NewChildStartNoEarlierThan = null;
@@ -919,6 +1004,9 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
             IsEditingPredecessors = false;
             IsEditingStartNoEarlierThan = false;
             IsEditingWork = false;
+
+            OnPropertyChanged(nameof(IsEditingStartDate));
+            OnPropertyChanged(nameof(IsEditingEndDate));
         }
 
         private void CancelAllEdits()

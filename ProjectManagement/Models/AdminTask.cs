@@ -6,6 +6,9 @@ namespace WpfResourceGantt.ProjectManagement.Models
 {
     public class AdminTask
     {
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
         [Key]
         public string Id { get; set; } = Guid.NewGuid().ToString();
 

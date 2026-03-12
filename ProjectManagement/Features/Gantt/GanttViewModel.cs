@@ -173,20 +173,15 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                     _searchText = value;
                     OnPropertyChanged();
 
-                    // --- DEBOUNCE LOGIC ---
-                    // Cancel previous search if user keeps typing
                     _searchCancellationToken?.Cancel();
                     _searchCancellationToken = new CancellationTokenSource();
-
                     var token = _searchCancellationToken.Token;
 
-                    // Wait 300ms. If token not cancelled, run filter.
                     Task.Delay(300, token).ContinueWith(async _ =>
                     {
                         if (token.IsCancellationRequested) return;
-
-                        // Run on UI Thread to update Observables safely
-                        await Application.Current.Dispatcher.InvokeAsync(() => ApplyFilter());
+                        // Search does NOT force an auto-fit zoom
+                        await Application.Current.Dispatcher.InvokeAsync(() => ApplyFilter(zoomToFit: false));
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
             }
@@ -206,7 +201,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
         }
         // --- FILTERING LOGIC ---
 
-        private async void ApplyFilter()
+        private async void ApplyFilter(bool zoomToFit = false)
         {
             // Capture state
             string searchText = SearchText;
@@ -223,6 +218,10 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
             {
                 foreach (var item in WorkItems) SetVisibilityRecursive(item, true);
                 CalculateTimeline(WorkItems.ToList());
+                if (zoomToFit && _lastAvailableWidth > 0)
+                {
+                    PerformFit(_lastAvailableWidth);
+                }
                 return;
             }
 
@@ -240,7 +239,12 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     ApplyVisibilityResults(WorkItems, visibleIds, expandedIds);
-                    RecalculateTimelineBasedOnFilter();
+
+                    // ONLY resize the timeline X-Axis if the user explicitly requested it
+                    if (zoomToFit)
+                    {
+                        RecalculateTimelineBasedOnFilter();
+                    }
                 });
             });
         }
@@ -337,7 +341,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
         {
             foreach (var item in items)
             {
-                bool shouldBeVisible = visibleIds.Contains(item.Id);
+                bool shouldBeVisible = visibleIds.Contains(item.Id) && !item.IsMilestone;
                 if (item.IsVisible != shouldBeVisible) item.IsVisible = shouldBeVisible;
 
                 // Only expand if necessary (don't collapse if user manually expanded)
@@ -392,8 +396,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                 }
             }
 
-            // Final Visibility Decision
-            item.IsVisible = matchesSelf || childMatches;
+            // Final Visibility Decision - Milestones are never shown as rows
+            item.IsVisible = (matchesSelf || childMatches) && !item.IsMilestone;
 
             // Auto-Expand if a child matches so the user sees the result
             if (childMatches)
@@ -406,7 +410,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
 
         private void SetVisibilityRecursive(WorkItem item, bool isVisible)
         {
-            item.IsVisible = isVisible;
+            item.IsVisible = isVisible && !item.IsMilestone;
             foreach (var child in item.Children)
             {
                 SetVisibilityRecursive(child, isVisible);
@@ -431,14 +435,13 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                     _selectedSystemFilter = value;
                     OnPropertyChanged();
 
-                    // Cascade: When System changes, reset Project/SubProject and reload Projects
                     _selectedProjectFilter = null;
                     _selectedSubProjectFilter = null;
                     OnPropertyChanged(nameof(SelectedProjectFilter));
                     OnPropertyChanged(nameof(SelectedSubProjectFilter));
 
                     LoadProjectOptions();
-                    ApplyFilter();
+                    ApplyFilter(zoomToFit: true); // Explicitly fit to this filter
                 }
             }
         }
@@ -454,12 +457,11 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                     _selectedProjectFilter = value;
                     OnPropertyChanged();
 
-                    // Cascade: When Project changes, reset SubProject and reload SubProjects
                     _selectedSubProjectFilter = null;
                     OnPropertyChanged(nameof(SelectedSubProjectFilter));
 
                     LoadSubProjectOptions();
-                    ApplyFilter();
+                    ApplyFilter(zoomToFit: true);
                 }
             }
         }
@@ -474,7 +476,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                 {
                     _selectedSubProjectFilter = value;
                     OnPropertyChanged();
-                    ApplyFilter();
+                    ApplyFilter(zoomToFit: true);
                 }
             }
         }
@@ -494,7 +496,6 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                 : _dataService.GetSystemsForUser(MainViewModel.CurrentUser);
             var workItemsToShow = ConvertToWorkItems(userSystems);
 
-            CalculateTimeline(workItemsToShow);
 
             foreach (var system in workItemsToShow)
             {
@@ -512,12 +513,10 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
             // 4. UPDATE UI
             Application.Current.Dispatcher.Invoke(() =>
             {
-                WorkItems.Clear();
-                foreach (var item in workItemsToShow)
-                {
-                    WorkItems.Add(item);
-                }
+                MergeWorkItems(WorkItems, workItemsToShow);
+
                 OnPropertyChanged(nameof(HasAssignments));
+                ApplyCurrentFiltersSync();
             });
         }
 
@@ -815,13 +814,20 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
             // Restore Selections
             if (sysId != null)
             {
-                SelectedSystemFilter = SystemOptions.FirstOrDefault(x => x.Id == sysId);
+                _selectedSystemFilter = SystemOptions.FirstOrDefault(x => x.Id == sysId);
+                OnPropertyChanged(nameof(SelectedSystemFilter));
+
+                LoadProjectOptions();
                 if (projId != null)
                 {
-                    SelectedProjectFilter = ProjectOptions.FirstOrDefault(x => x.Id == projId);
+                    _selectedProjectFilter = ProjectOptions.FirstOrDefault(x => x.Id == projId);
+                    OnPropertyChanged(nameof(SelectedProjectFilter));
+
+                    LoadSubProjectOptions();
                     if (subId != null)
                     {
-                        SelectedSubProjectFilter = SubProjectOptions.FirstOrDefault(x => x.Id == subId);
+                        _selectedSubProjectFilter = SubProjectOptions.FirstOrDefault(x => x.Id == subId);
+                        OnPropertyChanged(nameof(SelectedSubProjectFilter));
                     }
                 }
             }
@@ -866,8 +872,18 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
 
         private void ClearFilters()
         {
-            SelectedSystemFilter = null; // Setter triggers cascade clear
-            SearchText = string.Empty;
+            _selectedSystemFilter = null;
+            _selectedProjectFilter = null;
+            _selectedSubProjectFilter = null;
+
+            OnPropertyChanged(nameof(SelectedSystemFilter));
+            OnPropertyChanged(nameof(SelectedProjectFilter));
+            OnPropertyChanged(nameof(SelectedSubProjectFilter));
+
+            _searchText = string.Empty;
+            OnPropertyChanged(nameof(SearchText));
+
+            ApplyFilter(zoomToFit: true); // Refit to global view
         }
 
         private void CollapseRecursive(WorkItem item)
@@ -932,6 +948,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
 
             // 3. Save the fully updated data model to the JSON file.
             // This is now safe because the backend list is reordered and re-ID'd.
+            string reorderSystemId = draggedId.Contains("|") ? draggedId.Split('|')[0] : draggedId;
+            _dataService.MarkSystemDirty(reorderSystemId);
             await _dataService.SaveDataAsync();
         }
         public void OnUserChanged(User newUser)
@@ -973,19 +991,18 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
             var expandedIds = new HashSet<string>();
             var visibleBlocksIds = new HashSet<string>();
             GetStateRecursive(WorkItems, expandedIds, visibleBlocksIds);
-            // CHECK FOR SIMULATION MODE
+
             var userSystems = IsSimulationMode
                 ? _simulatedData.ToList()
                 : _dataService.GetSystemsForUser(MainViewModel.CurrentUser);
 
             var workItemsToShow = ConvertToWorkItems(userSystems);
 
-            // All EVM values (BAC, BCWS, BCWP, ACWP, Progress, dates) are now
-            // authoritative from the data model, calculated by EvmCalculationService
-            // in DataService.LoadDataAsync(). We only need to:
-            //   1. Calculate timeline boundaries for the chart
-            //   2. Calculate health COLORS (display-only, not EVM values)
-            CalculateTimeline(workItemsToShow);
+            // Only force a hard recalculation of the whole timeline if it's completely empty
+            if (ProjectStartDate == DateTime.MinValue || ProjectEndDate == DateTime.MinValue || !WorkItems.Any())
+            {
+                CalculateTimeline(workItemsToShow);
+            }
 
             foreach (var system in workItemsToShow)
             {
@@ -994,15 +1011,12 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                     CalculateOverallHealthRecursively(project);
                 }
             }
+
             SetStateRecursive(workItemsToShow, expandedIds, visibleBlocksIds);
 
-            WorkItems.Clear();
-            foreach (var item in workItemsToShow)
-            {
-                WorkItems.Add(item);
-            }
+            MergeWorkItems(WorkItems, workItemsToShow);
             OnPropertyChanged(nameof(HasAssignments));
-
+            ApplyCurrentFiltersSync();
             PopulateFilters();
         }
 
@@ -1533,9 +1547,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
 
             foreach (var system in systems)
             {
-                var projectManager = _dataService.AllUsers.FirstOrDefault(u => u.Id == system.ProjectManagerId);
-                var sectionChief = sectionChiefs.FirstOrDefault(sc => sc.ManagedProjectManagerIds?.Contains(system.ProjectManagerId) ?? false);
-
+                // Systems are containers — no ProjectManagerId. PM info is per-project now.
                 var systemWorkItem = new WorkItem
                 {
                     ItemType = WorkItemType.System,
@@ -1544,10 +1556,9 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                     Name = system.Name,
                     DisplayName = FormatDisplayName(system.Name, 0),
 
-                    // MAP THE NEW DATA FROM THE JSON
-
-                    ProjectManagerName = projectManager?.Name,
-                    SectionChiefName = sectionChief?.Name,
+                    // System level no longer has a single PM or Section Chief
+                    ProjectManagerName = null,
+                    SectionChiefName = null,
                     Status = system.Status
                 };
 
@@ -1597,12 +1608,14 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                 BaselineEndDate = item.BaselineEndDate,
 
                 DeveloperName = GetAssignedDeveloperNames(item),
-                // Map type based on our logic above
-                ItemType = isActuallySummary ? WorkItemType.Summary : WorkItemType.Leaf,
+                // Map type based on our logic above, but preserve Milestones
+                ItemType = item.ItemType == WorkItemType.Milestone ? WorkItemType.Milestone : (isActuallySummary ? WorkItemType.Summary : item.ItemType),
                 AssignDeveloperCommand = MainViewModel.AssignDeveloperCommand,
-                Status = item.Status
+                Status = item.Status,
+                IsVisible = item.ItemType != WorkItemType.Milestone
             };
 
+            workItem.PropertyChanged += OnWorkItemPropertyChanged;
             // Only allow progress blocks (checklists) on true Leaf tasks (items with no children)
             if (!hasChildren && item.ProgressBlocks != null)
             {
@@ -1670,5 +1683,205 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
             OnPropertyChanged(nameof(IsTodayLineVisible));
             OnPropertyChanged(nameof(TodayLinePosition));
         }
+
+        private void MergeWorkItems(ObservableCollection<WorkItem> targetList, List<WorkItem> sourceList)
+        {
+            // Check if the structure (number of items and IDs) is identical
+            bool structuralMatch = targetList.Count == sourceList.Count;
+            if (structuralMatch)
+            {
+                for (int i = 0; i < targetList.Count; i++)
+                {
+                    if (targetList[i].Id != sourceList[i].Id)
+                    {
+                        structuralMatch = false;
+                        break;
+                    }
+                }
+            }
+
+            if (structuralMatch)
+            {
+                // Structure matches: update properties in-place so UI containers aren't destroyed
+                for (int i = 0; i < targetList.Count; i++)
+                {
+                    UpdateWorkItemInPlace(targetList[i], sourceList[i]);
+                }
+            }
+            else
+            {
+                // Structure changed: 
+                // BEFORE CLEARING: Detach handlers to prevent memory leaks
+                foreach (var item in targetList) DetachHandlersRecursive(item);
+
+                targetList.Clear();
+                foreach (var item in sourceList)
+                {
+                    targetList.Add(item);
+                }
+            }
+        }
+
+// Helper method
+        private void DetachHandlersRecursive(WorkItem item)
+        {
+            item.PropertyChanged -= OnWorkItemPropertyChanged;
+            foreach (var child in item.Children) DetachHandlersRecursive(child);
+        }
+
+        private void UpdateWorkItemInPlace(WorkItem target, WorkItem source)
+        {
+            // Sync all viewable properties that affect the Gantt chart and grid
+            if (target.Name != source.Name) target.Name = source.Name;
+            if (target.WbsValue != source.WbsValue) target.WbsValue = source.WbsValue;
+            if (target.DisplayName != source.DisplayName) target.DisplayName = source.DisplayName;
+            if (target.StartDate != source.StartDate) target.StartDate = source.StartDate;
+            if (target.EndDate != source.EndDate) target.EndDate = source.EndDate;
+            if (target.Progress != source.Progress) target.Progress = source.Progress;
+            if (target.Work != source.Work) target.Work = source.Work;
+            if (target.ActualWork != source.ActualWork) target.ActualWork = source.ActualWork;
+            if (target.Bcws != source.Bcws) target.Bcws = source.Bcws;
+            if (target.Bcwp != source.Bcwp) target.Bcwp = source.Bcwp;
+            if (target.Acwp != source.Acwp) target.Acwp = source.Acwp;
+            if (target.ActualFinishDate != source.ActualFinishDate) target.ActualFinishDate = source.ActualFinishDate;
+            if (target.ScheduleVariance != source.ScheduleVariance) target.ScheduleVariance = source.ScheduleVariance;
+            if (target.CostVariance != source.CostVariance) target.CostVariance = source.CostVariance;
+            if (target.Predecessors != source.Predecessors) target.Predecessors = source.Predecessors;
+            if (target.IsCritical != source.IsCritical) target.IsCritical = source.IsCritical;
+            if (target.TotalFloat != source.TotalFloat) target.TotalFloat = source.TotalFloat;
+            if (target.IsBaselined != source.IsBaselined) target.IsBaselined = source.IsBaselined;
+            if (target.BaselineStartDate != source.BaselineStartDate) target.BaselineStartDate = source.BaselineStartDate;
+            if (target.BaselineEndDate != source.BaselineEndDate) target.BaselineEndDate = source.BaselineEndDate;
+            if (target.DeveloperName != source.DeveloperName) target.DeveloperName = source.DeveloperName;
+            if (target.Status != source.Status) target.Status = source.Status;
+            if (target.WorkHealth != source.WorkHealth) target.WorkHealth = source.WorkHealth;
+            if (target.Level != source.Level) target.Level = source.Level;
+            if (target.ItemType != source.ItemType) target.ItemType = source.ItemType;
+
+            // Recurse to sync all children
+            MergeWorkItems(target.Children, source.Children.ToList());
+        }
+
+        private void EnsureTimelineEncompassesData(List<WorkItem> items)
+        {
+            var minDate = DateTime.MaxValue;
+            var maxDate = DateTime.MinValue;
+            FindAbsoluteDateRange(items, ref minDate, ref maxDate);
+
+            if (minDate == DateTime.MaxValue) return;
+
+            bool boundsChanged = false;
+
+            // Expand outward safely, never shrink inward (which would ruin current zoom focus)
+            if (minDate < ProjectStartDate)
+            {
+                ProjectStartDate = new DateTime(minDate.Year, minDate.Month, 1);
+                boundsChanged = true;
+            }
+
+            if (maxDate > ProjectEndDate)
+            {
+                ProjectEndDate = new DateTime(maxDate.Year, maxDate.Month, 1).AddMonths(6).AddDays(-1);
+                boundsChanged = true;
+            }
+
+            if (boundsChanged)
+            {
+                RecalculateTimelineWidths(); // Re-calculates total width based on EXISTING ZoomLevel
+            }
+        }
+
+        private void ApplyCurrentFiltersSync()
+        {
+            string searchText = SearchText;
+            string systemId = _selectedSystemFilter?.Id;
+            string projectId = _selectedProjectFilter?.Id;
+            string subProjectId = _selectedSubProjectFilter?.Id;
+
+            bool hasSearchText = !string.IsNullOrWhiteSpace(searchText);
+            string filterId = subProjectId ?? projectId ?? systemId;
+            bool hasDropdown = !string.IsNullOrEmpty(filterId);
+
+            if (!hasSearchText && !hasDropdown)
+            {
+                // No filters active, make sure everything is visible
+                foreach (var item in WorkItems) SetVisibilityRecursive(item, true);
+                return;
+            }
+
+            var visibleIds = new HashSet<string>();
+            var expandedIds = new HashSet<string>();
+
+            foreach (var item in WorkItems)
+            {
+                CalculateVisibility(item, searchText, filterId, visibleIds, expandedIds);
+            }
+
+            ApplyVisibilityResults(WorkItems, visibleIds, expandedIds);
+        }
+
+        private void OnWorkItemPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(WorkItem.IsExpanded))
+            {
+                var item = sender as WorkItem;
+                if (item == null || item.Level != 1) return; // Only trigger for Project level
+
+                if (item.IsExpanded)
+                {
+                    // Focus the timeline on this specific project
+                    FocusTimelineOnItem(item);
+                }
+                else
+                {
+                    // When collapsing, check if we should reset to the full view
+                    ResetTimelineToFullView();
+                }
+            }
+        }
+
+        private void FocusTimelineOnItem(WorkItem item)
+        {
+            if (item.StartDate == DateTime.MinValue || item.EndDate == DateTime.MinValue) return;
+
+            // 1. Set the timeline bounds to the project's dates (plus a little padding)
+            ProjectStartDate = item.StartDate.AddDays(-7); // 1 week lead-in
+            ProjectEndDate = item.EndDate.AddMonths(1);    // 1 month tail
+
+            // 2. Trigger the fit calculation using the last known width
+            if (_lastAvailableWidth > 0)
+            {
+                PerformFit(_lastAvailableWidth);
+            }
+            else
+            {
+                RecalculateTimelineWidths();
+            }
+        }
+
+        private void ResetTimelineToFullView()
+        {
+            // Check if any OTHER project is still expanded
+            var otherExpandedProject = WorkItems
+                .SelectMany(s => s.Children)
+                .FirstOrDefault(p => p.Level == 1 && p.IsExpanded);
+
+            if (otherExpandedProject != null)
+            {
+                // If another project is open, focus on that one instead of resetting fully
+                FocusTimelineOnItem(otherExpandedProject);
+            }
+            else
+            {
+                // Otherwise, reset to the full system-wide date range
+                CalculateTimeline(WorkItems.ToList());
+
+                if (_lastAvailableWidth > 0)
+                {
+                    PerformFit(_lastAvailableWidth);
+                }
+            }
+        }
+
     }
 }

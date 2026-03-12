@@ -138,7 +138,14 @@
 
         <!-- 
             ===================================================================
-            GROUP 3: Baseline Bar (The "Ghost" Bar)
+            GROUP 3: Embedded Milestones
+            ===================================================================
+        -->
+        <Canvas x:Name="MilestonesCanvas" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="20" IsHitTestVisible="False"/>
+
+        <!-- 
+            ===================================================================
+            GROUP 4: Baseline Bar (The "Ghost" Bar)
             ===================================================================
         -->
         <Border x:Name="BaselineBar" Grid.Row="1" Height="4" Background="#8094A3B8" CornerRadius="2" 

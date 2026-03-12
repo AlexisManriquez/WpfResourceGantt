@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace WpfResourceGantt.ProjectManagement.Models
 {
-    public enum WorkItemType { System, Summary, Leaf, Receipt }
+    public enum WorkItemType { System, Summary, Leaf, Receipt, Milestone }
 
     public class TaskItems
     {
@@ -137,6 +138,13 @@ namespace WpfResourceGantt.ProjectManagement.Models
 
     public class SystemItem
     {
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool IsDirty { get; set; }
+
         public int Sequence { get; set; }
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -146,22 +154,20 @@ namespace WpfResourceGantt.ProjectManagement.Models
         [JsonPropertyName("name")]
         public string? Name { get; set; }
 
-        [JsonPropertyName("projectManagerId")]
-        public string? ProjectManagerId { get; set; }
-
         [JsonPropertyName("status")]
         public WorkItemStatus Status { get; set; } = WorkItemStatus.Active;
 
         [JsonPropertyName("children")] // Changed from "projects"
         public List<WorkBreakdownItem> Children { get; set; } = new List<WorkBreakdownItem>();
 
-        public void RecalculateRollup()
+        public void RecalculateRollup(DateTime? statusDate = null)
         {
             if (Children != null && Children.Any())
             {
                 foreach (var child in Children)
                 {
-                    child.RecalculateRollup();
+                    // Forward the simulation date to the WorkBreakdownItems
+                    child.RecalculateRollup(statusDate);
                 }
             }
         }
@@ -185,8 +191,38 @@ namespace WpfResourceGantt.ProjectManagement.Models
 
     public class WorkBreakdownItem : ViewModelBase
     {
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool IsDirty { get; set; }
+
         public const decimal HourlyRate = 195m;
         public WorkItemType ItemType { get; set; } = WorkItemType.Leaf;
+
+        /// <summary>
+        /// Quick-access boolean for XAML bindings and service checks.
+        /// True when ItemType is Milestone.
+        /// </summary>
+        [NotMapped]
+        [JsonIgnore]
+        public bool IsMilestone => ItemType == WorkItemType.Milestone;
+
+        /// <summary>
+        /// Enforces milestone constraints: DurationDays = 0, StartDate == EndDate.
+        /// Called when ItemType is set to Milestone.
+        /// </summary>
+        public void EnforceMilestoneConstraints()
+        {
+            if (!IsMilestone) return;
+            DurationDays = 0;
+            if (EndDate.HasValue)
+                StartDate = EndDate;
+            else if (StartDate.HasValue)
+                EndDate = StartDate;
+        }
+
         public int Sequence { get; set; }
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -307,27 +343,48 @@ namespace WpfResourceGantt.ProjectManagement.Models
             get => _isTestBlocksExpanded;
             set { _isTestBlocksExpanded = value; OnPropertyChanged(); }
         }
-        public void RecalculateRollup()
+        public void RecalculateRollup(DateTime? statusDate = null)
         {
+            DateTime effectiveDate = statusDate ?? DateTime.Today;
+
+            // MILESTONE ENFORCEMENT: Milestones are zero-duration, point-in-time items.
+            // They never contribute to parent rollup and never generate EVM metrics.
+            if (IsMilestone)
+            {
+                EnforceMilestoneConstraints();
+                // Milestones produce zero PV / EV / AC
+                Work = 0;
+                BAC = 0;
+                Bcws = 0;
+                Bcwp = 0;
+                Acwp = 0;
+                return;
+            }
+
             if (Children != null && Children.Any())
             {
                 // --- SUMMARY LOGIC (Rollup from Children) ---
                 foreach (var child in Children)
                 {
-                    child.RecalculateRollup();
+                    child.RecalculateRollup(effectiveDate);
                 }
+
+                // MILESTONE EXCLUSION: Filter out milestone children from timeline and EVM rollup.
+                // Milestones are point-in-time markers and must not expand parent date bounds
+                // or contribute to financial/resource aggregation.
+                var rollupChildren = Children.Where(c => !c.IsMilestone).ToList();
 
                 // 2.Summary Logic: Include current Parent dates in the comparison
                 // to avoid "shrinking" imported buffers.
-                DateTime childrenMin = Children.Where(c => c.StartDate.HasValue)
+                DateTime childrenMin = rollupChildren.Where(c => c.StartDate.HasValue)
                                               .Select(c => c.StartDate.Value)
                                               .DefaultIfEmpty(this.StartDate ?? DateTime.Today).Min();
 
-                DateTime childrenMax = Children.Where(c => c.EndDate.HasValue)
+                DateTime childrenMax = rollupChildren.Where(c => c.EndDate.HasValue)
                                               .Select(c => c.EndDate.Value)
                                               .DefaultIfEmpty(this.EndDate ?? DateTime.Today).Max();
 
-                // 2. Strict Rollup: Parent takes the exact bounds of children
+                // 2. Strict Rollup: Parent takes the exact bounds of non-milestone children
                 if (childrenMin != default(DateTime)) StartDate = childrenMin;
                 if (childrenMax != default(DateTime)) EndDate = childrenMax;
 
@@ -337,43 +394,49 @@ namespace WpfResourceGantt.ProjectManagement.Models
                     DurationDays = GetBusinessDaysSpan(StartDate.Value, EndDate.Value);
                 }
 
-                // Parent Duration = Sum of child durations
-                Work = Math.Round(Children.Sum(c => c.Work ?? 0), 2);
-                ActualWork = Math.Round(Children.Sum(c => c.ActualWork ?? 0), 2);
-                BAC = Math.Round(Children.Sum(c => c.BAC ?? 0), 2);
-                Bcws = Math.Round(Children.Sum(c => c.Bcws ?? 0), 2);
-                Bcwp = Math.Round(Children.Sum(c => c.Bcwp ?? 0), 2);
-                Acwp = Math.Round(Children.Sum(c => c.Acwp ?? 0), 2);
+                // Parent Duration = Sum of non-milestone child values
+                Work = Math.Round(rollupChildren.Sum(c => c.Work ?? 0), 2);
+                ActualWork = Math.Round(rollupChildren.Sum(c => c.ActualWork ?? 0), 2);
+                BAC = Math.Round(rollupChildren.Sum(c => c.BAC ?? 0), 2);
+                Bcws = Math.Round(rollupChildren.Sum(c => c.Bcws ?? 0), 2);
+                Bcwp = Math.Round(rollupChildren.Sum(c => c.Bcwp ?? 0), 2);
+                Acwp = Math.Round(rollupChildren.Sum(c => c.Acwp ?? 0), 2);
 
                 // Progress (Weighted by BAC)
                 decimal totalBac = BAC ?? 0;
                 if (totalBac > 0)
                     Progress = (double)((decimal)(Bcwp ?? 0) / totalBac);
+                else if (rollupChildren.Any())
+                    Progress = rollupChildren.Average(c => c.Progress);
                 else
-                    Progress = Children.Average(c => c.Progress);
+                    Progress = 0;
             }
             else
             {
+                if (StartDate.HasValue && DurationDays > 0)
+                {
+                    // Ensure the model uses the same inclusive logic
+                    EndDate = AddBusinessDays(StartDate.Value, DurationDays);
+                }
                 // LEAF LOGIC
                 if (!IsBaselined && (Work ?? 0) > 0)
                 {
                     BAC = (decimal)Work.Value * HourlyRate;
                 }
-                DateTime today = DateTime.Today;
 
                 if (StartDate.HasValue && EndDate.HasValue && BAC.HasValue && BAC.Value > 0)
                 {
                     // DoD/MS Project Standard: Inclusive Business Days
                     int totalWorkingDays = GetBusinessDaysSpan(StartDate.Value, EndDate.Value);
-                    int daysElapsed = GetBusinessDaysSpan(StartDate.Value, today);
+                    int daysElapsed = GetBusinessDaysSpan(StartDate.Value, effectiveDate);
 
-                    if (today < StartDate.Value)
+                    if (effectiveDate < StartDate.Value)
                         Bcws = 0;
-                    else if (today > EndDate.Value)
+                    else if (effectiveDate > EndDate.Value)
                         Bcws = (double)BAC.Value;
                     else
                     {
-                        double plannedPercent = (double)daysElapsed / totalWorkingDays;
+                        double plannedPercent = totalWorkingDays > 0 ? (double)daysElapsed / totalWorkingDays : 0;
                         Bcws = Math.Round((double)BAC.Value * plannedPercent, 2);
                     }
                 }
@@ -386,21 +449,29 @@ namespace WpfResourceGantt.ProjectManagement.Models
 
         public static DateTime AddBusinessDays(DateTime start, int days)
         {
-            if (days == 0) return start;
+            // A 1-day task starts and ends on the same day.
+            // So we add (days - 1) to the start date.
+            if (days <= 0) return start;
 
             DateTime result = start;
-            int direction = days > 0 ? 1 : -1;
-            int remaining = Math.Abs(days);
+            int remaining = days - 1; // Subtract 1 to make it inclusive
 
             while (remaining > 0)
             {
-                result = result.AddDays(direction);
+                result = result.AddDays(1);
                 if (result.DayOfWeek != DayOfWeek.Saturday && result.DayOfWeek != DayOfWeek.Sunday)
                     remaining--;
             }
             return result;
         }
-
+        public static DateTime EnsureBusinessDay(DateTime date)
+        {
+            if (date.DayOfWeek == DayOfWeek.Saturday)
+                return date.AddDays(2); // Move to Monday
+            if (date.DayOfWeek == DayOfWeek.Sunday)
+                return date.AddDays(1); // Move to Monday
+            return date;
+        }
         public static int GetBusinessDaysSpan(DateTime start, DateTime end)
         {
             int count = 0;

@@ -6,6 +6,7 @@ using System.Windows.Input;
 using WpfResourceGantt.ProjectManagement.Models;
 using WpfResourceGantt.ProjectManagement.Services;
 using WpfResourceGantt.ProjectManagement.ViewModels;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WpfResourceGantt.ProjectManagement.Features.Simulation
 {
@@ -41,7 +42,46 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
                     if (SandboxGanttContext != null)
                         SandboxGanttContext.SimulatedDate = value;
 
+                    // ──── FIX: SYNC PROGRESS FROM GRAPH PROFILES TO THE NEW DATE ────
+                    SyncProfiledItemsProgress();
+
                     RecalculateSandbox();
+
+                    // Regenerate the interactive timeline so dots automatically extend to the new date
+                    if (IsItemSelected)
+                    {
+                        GenerateInteractiveTimeline(true);
+                    }
+                }
+            }
+        }
+
+        private DateTime? _customGraphStartDate;
+        public DateTime? CustomGraphStartDate
+        {
+            get => _customGraphStartDate;
+            set
+            {
+                if (_customGraphStartDate != value)
+                {
+                    _customGraphStartDate = value;
+                    OnPropertyChanged();
+                    if (SelectedItem != null) GenerateInteractiveTimeline(true); // Force regenerate
+                }
+            }
+        }
+
+        private DateTime? _customGraphEndDate;
+        public DateTime? CustomGraphEndDate
+        {
+            get => _customGraphEndDate;
+            set
+            {
+                if (_customGraphEndDate != value)
+                {
+                    _customGraphEndDate = value;
+                    OnPropertyChanged();
+                    if (SelectedItem != null) GenerateInteractiveTimeline(true); // Force regenerate
                 }
             }
         }
@@ -53,7 +93,14 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
             set
             {
                 _selectedItem = value;
+
+                // Reset the custom view range so new items auto-fit to their data initially
+                _customGraphStartDate = null;
+                _customGraphEndDate = null;
+
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(CustomGraphStartDate));
+                OnPropertyChanged(nameof(CustomGraphEndDate));
                 OnPropertyChanged(nameof(IsItemSelected));
 
                 GenerateInteractiveTimeline();
@@ -72,12 +119,12 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
 
         public ICommand ToggleEditModeCommand { get; }
 
-       
+
         // Live vs Simulated Metrics
         public double LiveTotalBcws { get; private set; }
         public double LiveTotalBcwp { get; private set; }
         public double LiveTotalSv => LiveTotalBcwp - LiveTotalBcws;
-        
+
         // NEW Live Properties
         public double LiveTotalAcwp { get; private set; }
         public double LiveTotalCv => LiveTotalBcwp - LiveTotalAcwp;
@@ -103,7 +150,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
         public double SimTotalCv => SimTotalBcwp - SimTotalAcwp;
         public double SimTotalSpi => SimTotalBcws != 0 ? Math.Round(SimTotalBcwp / SimTotalBcws, 2) : 0;
         public double SimTotalCpi => SimTotalAcwp != 0 ? Math.Round(SimTotalBcwp / SimTotalAcwp, 2) : 0;
-        
+
         private double _simTotalBac;
         public double SimTotalBac { get => _simTotalBac; set { _simTotalBac = value; OnPropertyChanged(); OnPropertyChanged(nameof(SimTotalEac)); OnPropertyChanged(nameof(ImpactEac)); OnPropertyChanged(nameof(SimTotalTcpi)); } }
 
@@ -233,6 +280,10 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
 
             // STEP 3: Run the schedule and EVM engines with adjusted durations
             _scheduleService.CalculateSchedule(SimulatedSystems, SimulatedDate);
+            foreach (var system in SimulatedSystems)
+            {
+                system.RecalculateRollup(SimulatedDate);
+            }
             _evmService.RecalculateAll(SimulatedSystems, SimulatedDate);
             // --- FORCE THE GANTT CHART TO REDRAW WITH NEW DATES ---
             SandboxGanttContext?.RefreshAndPreserveState();
@@ -252,7 +303,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
             double simDenominator = SimTotalBac - SimTotalAcwp;
             SimTotalTcpi = simDenominator > 0 ? Math.Round((SimTotalBac - SimTotalBcwp) / simDenominator, 2) : double.PositiveInfinity;
         }
-        private void GenerateInteractiveTimeline()
+        private void GenerateInteractiveTimeline(bool forceRegenerate = false)
         {
             // 1. Unsubscribe current points
             foreach (var p in InteractiveDataPoints) p.PropertyChanged -= DataPoint_PropertyChanged;
@@ -260,39 +311,156 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
 
             if (SelectedItem == null || !SelectedItem.StartDate.HasValue) return;
 
+            List<SimulationDataPoint> oldProfile = null;
+
             // 2. CHECK CACHE: Do we already have a profile for this item?
             if (_simulationProfiles.ContainsKey(SelectedItem.Id))
             {
-                var cachedPoints = _simulationProfiles[SelectedItem.Id];
-                foreach (var p in cachedPoints)
+                if (!forceRegenerate)
                 {
-                    p.PropertyChanged += DataPoint_PropertyChanged;
-                    InteractiveDataPoints.Add(p);
+                    var cachedPoints = _simulationProfiles[SelectedItem.Id];
+                    foreach (var p in cachedPoints)
+                    {
+                        p.PropertyChanged += DataPoint_PropertyChanged;
+                        InteractiveDataPoints.Add(p);
+                    }
+                    return; // Exit early, we restored the curve
                 }
-                return; // Exit early, we restored the curve
+                else
+                {
+                    // Save the old profile so we can interpolate the user's manual drags into the new dot density
+                    oldProfile = _simulationProfiles[SelectedItem.Id];
+                }
             }
 
-            // 3. GENERATE NEW: (Only runs the first time you click an item)
-            DateTime start = SelectedItem.StartDate.Value;
-            DateTime itemEnd = SelectedItem.EndDate.GetValueOrDefault(start.AddMonths(1));
-            DateTime end = itemEnd > SimulatedDate ? itemEnd : SimulatedDate;
-            if ((end - start).TotalDays < 60) end = start.AddDays(60);
+            // 3. GENERATE NEW:
+            // Bound the timeline explicitly to the user's custom dates if they provided them
+            DateTime start = CustomGraphStartDate ?? SelectedItem.StartDate.Value;
+            DateTime plannedEnd = CustomGraphEndDate ?? SelectedItem.EndDate.GetValueOrDefault(SelectedItem.StartDate.Value.AddMonths(1));
+
+            DateTime end = plannedEnd;
+
+            var sortedHistory = SelectedItem.ProgressHistory?
+                                .OrderBy(h => h.Date)
+                                .ToList() ?? new List<ProgressHistoryItem>();
+
+            DateTime latestHistoryDate = sortedHistory.Any() ? sortedHistory.Last().Date : DateTime.MinValue;
+
+            // Only auto-extend the graph if the user hasn't explicitly locked the End Date
+            if (!CustomGraphEndDate.HasValue)
+            {
+                // Always ensure dots are available to manipulate all the way up to the simulated date
+                if (SimulatedDate > end)
+                    end = SimulatedDate;
+
+                // Also extend to the actual completion date if it finished later than planned
+                if (SelectedItem.ActualFinishDate.HasValue && SelectedItem.ActualFinishDate.Value > end)
+                    end = SelectedItem.ActualFinishDate.Value;
+
+                if (latestHistoryDate > end)
+                    end = latestHistoryDate;
+            }
+
+            // Failsafe against backwards date entry
+            if (start >= end) end = start.AddDays(1);
 
             var newPoints = new List<SimulationDataPoint>();
-            int week = 1;
+            int pointIndex = 1;
             DateTime current = start;
 
-            while (current <= end)
+            // Determine interval based on the CURRENT VIEW bounds, not the whole project
+            double totalGraphDays = (end - start).TotalDays;
+            int stepDays = 7;
+
+            if (totalGraphDays > 365 * 2) stepDays = 90;
+            else if (totalGraphDays > 365) stepDays = 30;
+            else if (totalGraphDays > 180) stepDays = 14;
+            else if (totalGraphDays <= 30) stepDays = 1;       // Zoomed in tight -> Daily dots
+
+            Func<DateTime, (double Progress, double Hours)> calculateMetricsAt = (date) =>
             {
-                var point = new SimulationDataPoint
+                // 1st Priority: If we are regenerating, sample the old curve so user tweaks survive the zoom!
+                if (oldProfile != null && oldProfile.Any())
                 {
-                    WeekNumber = week++,
+                    double prog = GetInterpolatedValue(oldProfile, date, p => p.Progress);
+                    double hrs = GetInterpolatedValue(oldProfile, date, p => p.ActualHours);
+                    return (prog, hrs);
+                }
+
+                // 2nd Priority: History Logs
+                if (sortedHistory.Count > 0)
+                {
+                    if (sortedHistory[sortedHistory.Count - 1].Date <= date)
+                        return (SelectedItem.Progress, SelectedItem.ActualWork ?? 0);
+                    else if (sortedHistory[0].Date > date)
+                        return (sortedHistory[0].ActualProgress, sortedHistory[0].ActualWork ?? 0);
+                    else
+                    {
+                        for (int k = sortedHistory.Count - 1; k >= 0; k--)
+                        {
+                            if (sortedHistory[k].Date <= date)
+                                return (sortedHistory[k].ActualProgress, sortedHistory[k].ActualWork ?? 0);
+                        }
+                    }
+                }
+
+                // 3rd Priority: Base Ramp-up
+                DateTime targetEndDate = (SelectedItem.Progress >= 0.99)
+                    ? (SelectedItem.ActualFinishDate ?? plannedEnd) : SimulatedDate;
+
+                if (date < start) return (0, 0);
+                if (date >= targetEndDate) return (SelectedItem.Progress, SelectedItem.ActualWork ?? 0);
+
+                double totalDays = (targetEndDate - SelectedItem.StartDate.Value).TotalDays;
+                if (totalDays <= 0) return (SelectedItem.Progress, SelectedItem.ActualWork ?? 0);
+
+                double elapsed = (date - SelectedItem.StartDate.Value).TotalDays;
+                double inferredProg = Math.Max(0, Math.Min(SelectedItem.Progress, SelectedItem.Progress * (elapsed / totalDays)));
+
+                double inferredHours = SelectedItem.Progress > 0
+                    ? (SelectedItem.ActualWork ?? 0) * (inferredProg / SelectedItem.Progress) : 0;
+
+                return (inferredProg, inferredHours);
+            };
+
+            while (current < end)
+            {
+                var metrics = calculateMetricsAt(current);
+                newPoints.Add(new SimulationDataPoint
+                {
+                    WeekNumber = pointIndex++,
                     Date = current,
-                    Progress = SelectedItem.Progress,
-                    ActualHours = SelectedItem.ActualWork ?? 0
-                };
-                newPoints.Add(point);
-                current = current.AddDays(7);
+                    Progress = Math.Round(metrics.Progress, 3),
+                    ActualHours = Math.Round(metrics.Hours, 1)
+                });
+
+                if (stepDays == 30) current = current.AddMonths(1);
+                else if (stepDays == 90) current = current.AddMonths(3);
+                else current = current.AddDays(stepDays);
+            }
+
+            if (!newPoints.Any())
+            {
+                var metrics = calculateMetricsAt(start);
+                newPoints.Add(new SimulationDataPoint
+                {
+                    WeekNumber = pointIndex++,
+                    Date = start,
+                    Progress = Math.Round(metrics.Progress, 3),
+                    ActualHours = Math.Round(metrics.Hours, 1)
+                });
+            }
+
+            if (newPoints.Last().Date < end)
+            {
+                var metrics = calculateMetricsAt(end);
+                newPoints.Add(new SimulationDataPoint
+                {
+                    WeekNumber = pointIndex++,
+                    Date = end,
+                    Progress = Math.Round(metrics.Progress, 3),
+                    ActualHours = Math.Round(metrics.Hours, 1)
+                });
             }
 
             // Save to cache and populate UI
@@ -303,7 +471,6 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
                 InteractiveDataPoints.Add(p);
             }
         }
-
         private void DataPoint_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (SelectedItem == null || !InteractiveDataPoints.Any()) return;
@@ -315,21 +482,22 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
 
             if (e.PropertyName == nameof(SimulationDataPoint.Progress))
             {
-                // ──── CASCADE FORWARD ────
-                // Dragging a dot sets the "from this point forward" value.
-                // All later dots are set to match the dragged value.
+                // ──── ENFORCE MONOTONICITY FORWARD ────
+                // When moving a dot UP, push future dots UP to maintain the floor.
+                // When moving a dot DOWN, future dots stay where they are (retaining their positions).
                 for (int i = changedIndex + 1; i < InteractiveDataPoints.Count; i++)
                 {
-                    if (InteractiveDataPoints[i].Progress != changedPoint.Progress)
+                    if (InteractiveDataPoints[i].Progress < changedPoint.Progress)
                     {
                         InteractiveDataPoints[i].PropertyChanged -= DataPoint_PropertyChanged;
                         InteractiveDataPoints[i].Progress = changedPoint.Progress;
                         InteractiveDataPoints[i].PropertyChanged += DataPoint_PropertyChanged;
                     }
+                    else break; // Successor is already higher than or equal to current point
                 }
 
-                // ──── CONSTRAIN BACKWARD ────
-                // Ensure earlier dots don't exceed this one (monotonic non-decreasing).
+                // ──── ENFORCE MONOTONICITY BACKWARD ────
+                // When moving a dot DOWN, pull previous dots DOWN to maintain the ceiling.
                 for (int i = changedIndex - 1; i >= 0; i--)
                 {
                     if (InteractiveDataPoints[i].Progress > changedPoint.Progress)
@@ -338,24 +506,24 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
                         InteractiveDataPoints[i].Progress = changedPoint.Progress;
                         InteractiveDataPoints[i].PropertyChanged += DataPoint_PropertyChanged;
                     }
-                    else break; // Earlier dots are already lower, stop
+                    else break; // Predecessor is already lower than or equal to current point
                 }
 
                 // ──── APPLY TO MODEL ────
                 // Read the value at the simulated status date
                 var relevantPoint = InteractiveDataPoints
-                    .Where(p => p.Date <= SimulatedDate)
-                    .OrderByDescending(p => p.Date)
-                    .FirstOrDefault() ?? InteractiveDataPoints.First();
+                .Where(p => p.Date <= SimulatedDate)
+                .OrderByDescending(p => p.Date)
+                .FirstOrDefault() ?? InteractiveDataPoints.First();
 
-                SelectedItem.Progress = relevantPoint.Progress;
+                SelectedItem.Progress = GetInterpolatedValue(InteractiveDataPoints, SimulatedDate, p => p.Progress);
 
                 // ──── SET / CLEAR ACTUAL FINISH DATE ────
                 // Find the earliest dot where progress first hits 100%
                 var completionPoint = InteractiveDataPoints
-                    .FirstOrDefault(p => p.Progress >= 1.0);
+                     .FirstOrDefault(p => p.Progress >= 1.0);
 
-                if (completionPoint != null && relevantPoint.Progress >= 1.0)
+                if (completionPoint != null && SelectedItem.Progress >= 1.0)
                 {
                     // Task is complete at the simulated date — lock finish date
                     SelectedItem.ActualFinishDate = completionPoint.Date;
@@ -368,18 +536,19 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
             }
             else if (e.PropertyName == nameof(SimulationDataPoint.ActualHours))
             {
-                // ──── CASCADE FORWARD (Hours) ────
+                // ──── ENFORCE MONOTONICITY FORWARD (Hours) ────
                 for (int i = changedIndex + 1; i < InteractiveDataPoints.Count; i++)
                 {
-                    if (InteractiveDataPoints[i].ActualHours != changedPoint.ActualHours)
+                    if (InteractiveDataPoints[i].ActualHours < changedPoint.ActualHours)
                     {
                         InteractiveDataPoints[i].PropertyChanged -= DataPoint_PropertyChanged;
                         InteractiveDataPoints[i].ActualHours = changedPoint.ActualHours;
                         InteractiveDataPoints[i].PropertyChanged += DataPoint_PropertyChanged;
                     }
+                    else break;
                 }
 
-                // Constrain backward for hours too
+                // ──── ENFORCE MONOTONICITY BACKWARD (Hours) ────
                 for (int i = changedIndex - 1; i >= 0; i--)
                 {
                     if (InteractiveDataPoints[i].ActualHours > changedPoint.ActualHours)
@@ -392,12 +561,13 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
                 }
 
                 var relevantPoint = InteractiveDataPoints
-                    .Where(p => p.Date <= SimulatedDate)
-                    .OrderByDescending(p => p.Date)
-                    .FirstOrDefault() ?? InteractiveDataPoints.First();
+                .Where(p => p.Date <= SimulatedDate)
+                .OrderByDescending(p => p.Date)
+                .FirstOrDefault() ?? InteractiveDataPoints.First();
 
-                SelectedItem.ActualWork = relevantPoint.ActualHours;
-                SelectedItem.Acwp = relevantPoint.ActualHours * 195.0;
+                double interpolatedHours = GetInterpolatedValue(InteractiveDataPoints, SimulatedDate, p => p.ActualHours);
+                SelectedItem.ActualWork = interpolatedHours;
+                SelectedItem.Acwp = interpolatedHours * 195.0;
             }
 
             RecalculateSandbox();
@@ -425,11 +595,11 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
 
             switch (SelectedScenario.Id)
             {
-                case "cp_slip":   ExecuteCriticalPathSlip();   break;
-                case "res_loss":  ExecuteResourceLoss();       break;
-                case "flat_30":   ExecuteFlatProgress30Days(); break;
-                case "recovery":  ExecuteOptimisticRecovery(); break;
-                case "shutdown":  ExecuteGovernmentShutdown(); break;
+                case "cp_slip": ExecuteCriticalPathSlip(); break;
+                case "res_loss": ExecuteResourceLoss(); break;
+                case "flat_30": ExecuteFlatProgress30Days(); break;
+                case "recovery": ExecuteOptimisticRecovery(); break;
+                case "shutdown": ExecuteGovernmentShutdown(); break;
             }
         }
 
@@ -676,18 +846,14 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
                 var item = FindLeafItemById(SimulatedSystems, itemId);
                 if (item == null) continue;
 
-                // Read the relevant dot at the simulated date
-                var relevantPoint = profile
-                    .Where(p => p.Date <= SimulatedDate)
-                    .OrderByDescending(p => p.Date)
-                    .FirstOrDefault() ?? profile.First();
-
-                item.Progress = relevantPoint.Progress;
-                item.ActualWork = relevantPoint.ActualHours;
-                item.Acwp = relevantPoint.ActualHours * 195.0;
+                // Use Interpolation to get exact progress at the new simulated date
+                item.Progress = GetInterpolatedValue(profile, SimulatedDate, p => p.Progress);
+                double interpolatedHours = GetInterpolatedValue(profile, SimulatedDate, p => p.ActualHours);
+                item.ActualWork = interpolatedHours;
+                item.Acwp = interpolatedHours * 195.0;
 
                 // Update ActualFinishDate
-                if (relevantPoint.Progress >= 1.0)
+                if (item.Progress >= 1.0)
                 {
                     var completionPoint = profile.FirstOrDefault(p => p.Progress >= 1.0);
                     item.ActualFinishDate = completionPoint?.Date;
@@ -697,6 +863,45 @@ namespace WpfResourceGantt.ProjectManagement.Features.Simulation
                     item.ActualFinishDate = null;
                 }
             }
+        }
+        private double GetInterpolatedValue(IEnumerable<SimulationDataPoint> points, DateTime targetDate, Func<SimulationDataPoint, double> valueSelector)
+        {
+            var sorted = points.OrderBy(p => p.Date).ToList();
+            if (!sorted.Any()) return 0;
+
+            if (targetDate <= sorted.First().Date) return valueSelector(sorted.First());
+            if (targetDate >= sorted.Last().Date) return valueSelector(sorted.Last());
+
+            for (int i = 0; i < sorted.Count - 1; i++)
+            {
+                var p1 = sorted[i];
+                var p2 = sorted[i + 1];
+
+                if (targetDate >= p1.Date && targetDate <= p2.Date)
+                {
+                    // ──── BUSINESS-DAY AWARE INTERPOLATION ────
+                    // Map the calendar segment to business day progression
+                    int segmentBusinessDays = WorkBreakdownItem.GetBusinessDaysSpan(p1.Date, p2.Date);
+                    int elapsedBusinessDays = WorkBreakdownItem.GetBusinessDaysSpan(p1.Date, targetDate);
+
+                    double t;
+                    if (segmentBusinessDays > 0)
+                    {
+                        t = (double)elapsedBusinessDays / segmentBusinessDays;
+                    }
+                    else
+                    {
+                        // Weekend segment: progress is stagnant (0.0) or complete (1.0)
+                        t = targetDate >= p2.Date ? 1.0 : 0.0;
+                    }
+
+                    double v1 = valueSelector(p1);
+                    double v2 = valueSelector(p2);
+
+                    return Math.Round(v1 + (v2 - v1) * t, 3);
+                }
+            }
+            return valueSelector(sorted.Last());
         }
 
         private WorkBreakdownItem FindLeafItemById(IEnumerable<SystemItem> systems, string id)

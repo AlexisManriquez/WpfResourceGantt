@@ -260,9 +260,9 @@ This module provides a specialized end-to-end pipeline to reconstruct a full DoD
 This module provides a risk-free environment for schedule and budget modeling.
 *   **Purpose**: Allows users to manipulate task progress and hours to see the resulting impact on Earned Value (SV/CV).
 *   **Key Files**:
-    *   **`SimulationViewModel.cs`**: Orchestrates cloning and time-travel recalculations.
-    *   **`InteractiveManipulatorGraph.xaml.cs`**: Custom WPF control for visual timeline manipulation.
-    *   **`SimulationView.xaml`**: The integrated command-and-control dashboard for simulations.
+    *   **`SimulationViewModel.cs`**: Orchestrates cloning, time-travel recalculations, and one-click stress test scenarios (Resource Loss, CP Slip, etc.).
+    *   **`InteractiveManipulatorGraph.xaml.cs`**: Custom WPF control for visual timeline manipulation with bidirectional data cascades.
+    *   **`SimulationView.xaml`**: The integrated command-and-control dashboard featuring real-time EVM Impact Bars and Critical Path alerts.
     *   **`CloneHelper.cs`**: Utility for deep-cloning complex `WorkItem` hierarchies.
 
 

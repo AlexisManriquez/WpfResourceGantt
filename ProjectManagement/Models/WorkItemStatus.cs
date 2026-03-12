@@ -27,7 +27,8 @@ namespace WpfResourceGantt.ProjectManagement.Models
         public static List<WorkItemType> AllWorkItemTypes { get; } = new List<WorkItemType>
         {
             WorkItemType.Leaf,
-            WorkItemType.Receipt
+            WorkItemType.Receipt,
+            WorkItemType.Milestone
         };
     }
 }

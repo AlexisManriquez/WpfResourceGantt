@@ -11,7 +11,7 @@ using WpfResourceGantt.ProjectManagement.Features.AssignDeveloper;
 using WpfResourceGantt.ProjectManagement.Models;
 using WpfResourceGantt.ProjectManagement.Services;
 using WpfResourceGantt.ProjectManagement.ViewModels;
-
+using static WpfResourceGantt.ProjectManagement.Models.WorkBreakdownItem;
 namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
 {
     public class FilterItem
@@ -35,7 +35,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
             get => _hierarchicalSystems;
             set { _hierarchicalSystems = value; OnPropertyChanged(); }
         }
-
+        private SystemHierarchyItemViewModel _dragAnchorItem;
+        private HashSet<string> _preDragSelectedIds = new HashSet<string>();
         private bool _isDraggingSelection = false;
         private bool _dragTargetState = false;
 
@@ -166,7 +167,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
         public ICommand AddWbsCommand { get; }
         public ICommand EditDetailsCommand { get; }
         public ICommand DeleteCommand { get; }
-
+        public ICommand ReplicateStructureCommand { get; }
 
         public SystemManagementViewModel(DataService dataService, User currentUser, MainViewModel mainViewModel, TemplateService templateService)
         {
@@ -219,43 +220,84 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
             EditDetailsCommand = new RelayCommand(
                 () => OpenTaskDetails(SelectedVM),
                 () => SelectedVM != null && SelectedVM.Level == 2);
+
             StartDragSelectionCommand = new RelayCommand<SystemHierarchyItemViewModel>(item =>
             {
                 if (item == null) return;
 
-                // 1. Handle SHIFT Selection (Range)
-                if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0 && _lastClickedItem != null)
+                _isDraggingSelection = true;
+                _dragAnchorItem = item;
+                _lastClickedItem = item;
+
+                // 1. Capture what was selected BEFORE the drag starts
+                _preDragSelectedIds.Clear();
+                var allVisible = new List<SystemHierarchyItemViewModel>();
+                GetFlattenedVisibleItems(HierarchicalSystems, allVisible);
+                foreach (var vm in allVisible.Where(x => x.IsSelected)) _preDragSelectedIds.Add(vm.Id);
+
+                // 2. Handle Logic for the First Click
+                if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
                 {
                     PerformShiftSelection(item);
                 }
-                // 2. Handle CTRL Selection (Toggle/Multi)
                 else if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
                 {
                     item.IsSelected = !item.IsSelected;
-                    _lastClickedItem = item;
+                    _dragTargetState = item.IsSelected; // Dragging will toggle others to this state
                 }
-                // 3. Normal Selection (Clear and Select One)
                 else
                 {
                     ClearAllSelection();
                     item.IsSelected = true;
-                    _lastClickedItem = item;
+                    _dragTargetState = true;
+                    _preDragSelectedIds.Clear(); // Fresh start
                 }
-                SelectedVM = item;
-                _isDraggingSelection = true;
-                _dragTargetState = item.IsSelected;
-            });
 
+                SelectedVM = item;
+            });
+            ReplicateStructureCommand = new RelayCommand(
+    ExecuteReplicateStructure,
+    () => SelectedVM != null && SelectedVM.Level == 2 // Only enabled for Subprojects
+);
             HoverSelectionCommand = new RelayCommand<SystemHierarchyItemViewModel>(item =>
             {
-                // Only apply if we are actively dragging
-                if (_isDraggingSelection && item != null)
+                // Crucial: Only logic if we are dragging and have a valid anchor
+                if (!_isDraggingSelection || item == null || _dragAnchorItem == null) return;
+
+                var flatList = new List<SystemHierarchyItemViewModel>();
+                GetFlattenedVisibleItems(HierarchicalSystems, flatList);
+
+                int anchorIdx = flatList.IndexOf(_dragAnchorItem);
+                int currentIdx = flatList.IndexOf(item);
+
+                if (anchorIdx == -1 || currentIdx == -1) return;
+
+                int min = Math.Min(anchorIdx, currentIdx);
+                int max = Math.Max(anchorIdx, currentIdx);
+
+                // 3. Recalculate selection for EVERY visible item
+                for (int i = 0; i < flatList.Count; i++)
                 {
-                    item.IsSelected = _dragTargetState;
+                    var currentItem = flatList[i];
+                    bool isInDragRange = (i >= min && i <= max);
+
+                    if (isInDragRange)
+                    {
+                        currentItem.IsSelected = _dragTargetState;
+                    }
+                    else
+                    {
+                        // If it's outside the current drag box, revert to its state before the drag began
+                        currentItem.IsSelected = _preDragSelectedIds.Contains(currentItem.Id);
+                    }
                 }
             });
 
-            EndDragSelectionCommand = new RelayCommand(() => _isDraggingSelection = false);
+            EndDragSelectionCommand = new RelayCommand(() =>
+            {
+                _isDraggingSelection = false;
+                _dragAnchorItem = null;
+            });
             ClearSelectionCommand = new RelayCommand(ClearAllSelection);
             // Wire up Copy/Paste to the Global Keyboard logic (usually in XAML or MainViewModel)
             CopySelectedCommand = new RelayCommand(ExecuteCopy);
@@ -315,7 +357,6 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
 
         private SystemHierarchyItemViewModel MapToViewModel(SystemItem item, HashSet<string> expandedIds)
         {
-            var user = _dataService.AllUsers.FirstOrDefault(u => u.Id == item.ProjectManagerId);
             var vm = new SystemHierarchyItemViewModel(SaveItem, DeleteItem, AddChild, AssignDeveloper, OpenTaskDetails, HandleApplyTemplate, HandleCopy, HandlePaste)
             {
                 IsLoading = true,
@@ -324,7 +365,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 WbsValue = item.WbsValue,
                 Name = item.Name,
                 Status = item.Status,
-                Assignee = user?.Name ?? "---",
+                Assignee = "--", // Systems are containers, no assignee
                 ScheduleMode = ScheduleMode.Dynamic,
                 IsExpanded = expandedIds?.Contains(item.Id) ?? false
             };
@@ -543,12 +584,13 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 // This ensures parent durations/dates in the Data Model match the new child values.
                 rootSystem?.RecalculateRollup();
 
+                _dataService.MarkSystemDirty(systemId);
                 await _dataService.SaveDataAsync();
             }
             finally
             {
                 _isInternalSave = false; // Reset guard
-                RefreshData(); // Rebuild tree to show computed schedule results (Critical Path, Slack, new Dates)
+                //RefreshData(); // Rebuild tree to show computed schedule results (Critical Path, Slack, new Dates)
             }
         }
 
@@ -570,16 +612,24 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
             if (vm.Level == 0)
             {
                 await _dataService.DeleteSystemAsync(vm.Id);
-                // REMOVED: HierarchicalSystems.Remove(vm);
+                // DeleteSystemAsync already handles cascade cleanup
             }
             else
             {
+                // CASCADE CLEANUP: Remove managed project IDs and assignments for deleted branch
+                var workItem = _dataService.GetWorkBreakdownItemById(vm.Id);
+                if (workItem != null)
+                {
+                    var deletedIds = new List<string> { workItem.Id };
+                    _dataService.CollectAllItemIdsRecursive(workItem.Children, deletedIds);
+                    _dataService.CleanupManagedProjectIds(deletedIds);
+                    _dataService.CleanupAssignmentsOnDelete(new List<WorkBreakdownItem> { workItem });
+                }
+
                 // Find parent and remove from model
                 var parent = FindParent(HierarchicalSystems, vm);
                 if (parent != null)
                 {
-                    // REMOVED: parent.Children.Remove(vm);
-
                     var parentModel = _dataService.GetWorkBreakdownItemById(parent.Id);
                     if (parentModel != null)
                     {
@@ -637,7 +687,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                                     ? $"{parent.NewChildNumber} {parent.NewChildName}".Trim()
                                     : $"{parentNumber}-{parent.NewChildNumber} {parent.NewChildName}".Trim();
             }
-
+            DateTime baseStart = parent.NewChildStartDate ?? DateTime.Today;
+            DateTime businessStart = EnsureBusinessDay(baseStart);
             var newItem = new WorkBreakdownItem
             {
                 Id = $"{parent.Id}|{parent.Children.Count}_{Guid.NewGuid().ToString("N").Substring(0, 4)}",
@@ -647,12 +698,15 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 Predecessors = parent.ResolvePredecessors(parent.NewChildPredecessors),
                 StartNoEarlierThan = parent.NewChildStartNoEarlierThan,
                 ScheduleMode = parent.Level == 0 ? parent.NewChildScheduleMode : parent.ScheduleMode, // Propagate selected mode if it's a new Project (Level 1), else inherit
-                StartDate = parent.NewChildStartDate ?? DateTime.Today,
-                EndDate = WorkBreakdownItem.AddBusinessDays(parent.NewChildStartDate ?? DateTime.Today, parent.NewChildDurationDays),
+                Level = parent.Level + 1,
+                StartDate = (parent.Level + 1 >= 3) ? businessStart : (DateTime?)null,
+
+                EndDate = (parent.Level + 1 >= 3)
+            ? WorkBreakdownItem.AddBusinessDays(businessStart, parent.NewChildDurationDays)
+            : (DateTime?)null,
                 Work = parent.NewChildWork ?? 0,
                 BAC = budgetedDollars,
-                Status = WorkItemStatus.Active,
-                Level = parent.Level + 1,
+                Status = WorkItemStatus.Active,                
                 Assignments = new List<ResourceAssignment>(),
                 ProgressHistory = new List<ProgressHistoryItem> { new ProgressHistoryItem { Id = Guid.NewGuid().ToString(), Date = DateTime.Today, ActualProgress = 0 } }
             };
@@ -671,6 +725,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
             // 1. Force a full regeneration of this system's branch
             _dataService.RegenerateWbsValues(rootSystemId);
 
+            _dataService.MarkSystemDirty(rootSystemId);
             await _dataService.SaveDataAsync();
 
             // 2. Refresh the UI using state-preservation logic
@@ -696,7 +751,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 Id = $"SYS-{Guid.NewGuid().ToString().Substring(0, 8)}",
                 WbsValue = (_dataService.AllSystems.Count + 1).ToString(),
                 Name = $"{NewSystemNumber} {NewSystemName}".Trim(),
-                ProjectManagerId = _currentUser.Id,
+                // Systems are containers — no ProjectManagerId assignment
                 Status = WorkItemStatus.Active,
                 Children = new List<WorkBreakdownItem>()
             };
@@ -782,8 +837,42 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                     }
                 }
 
+                // 5. SYNC ManagedProjectIds: If this is a Level 1 (Project), keep PM ManagedProjectIds in sync
+                if (vm.Level == 1)
+                {
+                    // Get all PM user IDs currently assigned to this project
+                    var assignedPmIds = updatedItem.Assignments
+                        .Select(a => a.DeveloperId)
+                        .Where(devId => _dataService.AllUsers.Any(u => u.Id == devId && u.Role == Role.ProjectManager))
+                        .Distinct()
+                        .ToList();
+
+                    // For each PM user, ensure ManagedProjectIds includes this project
+                    foreach (var pmUser in _dataService.AllUsers.Where(u => u.Role == Role.ProjectManager))
+                    {
+                        if (pmUser.ManagedProjectIds == null)
+                            pmUser.ManagedProjectIds = new List<string>();
+
+                        bool isAssigned = assignedPmIds.Contains(pmUser.Id);
+                        bool isTracked = pmUser.ManagedProjectIds.Contains(updatedItem.Id);
+
+                        if (isAssigned && !isTracked)
+                        {
+                            pmUser.ManagedProjectIds.Add(updatedItem.Id);
+                            _dataService.MarkUserDirty(pmUser.Id);
+                        }
+                        else if (!isAssigned && isTracked)
+                        {
+                            pmUser.ManagedProjectIds.Remove(updatedItem.Id);
+                            _dataService.MarkUserDirty(pmUser.Id);
+                        }
+                    }
+                }
+
                 // Refresh UI
                 UpdateAssigneeText(vm, updatedItem);
+                string assignSystemId = vm.Id.Contains("|") ? vm.Id.Split('|')[0] : vm.Id;
+                _dataService.MarkSystemDirty(assignSystemId);
                 await _dataService.SaveDataAsync();
             });
         }
@@ -845,7 +934,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 Bcws = item.Bcws,
                 Bcwp = item.Bcwp,
                 Acwp = item.Acwp,
-                ItemType = item.Children != null && item.Children.Any() ? WorkItemType.Summary : WorkItemType.Leaf,
+                ItemType = item.ItemType == WorkItemType.Milestone ? WorkItemType.Milestone : (item.Children != null && item.Children.Any() ? WorkItemType.Summary : item.ItemType),
                 // Map children recursively so detailed views can traverse the hierarchy
                 Children = new ObservableCollection<WorkItem>(item.Children?.Select(MapToWorkItem) ?? Enumerable.Empty<WorkItem>()),
 
@@ -860,36 +949,40 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
 
         public void RefreshData()
         {
-            // Ensure we are on the UI thread for capturing state and updating the collection
             if (Application.Current != null && !Application.Current.Dispatcher.CheckAccess())
             {
                 Application.Current.Dispatcher.Invoke(RefreshData);
                 return;
             }
-            SelectedVM = null;
-            // 1. Save currently selected IDs
-            string savedSysId = SelectedSystemFilter?.Id;
-            string savedProjId = SelectedProjectFilter?.Id;
-            string savedSubId = SelectedSubProjectFilter?.Id;
 
-            // 2. NEW: Save Expansion State
+            // 1. Capture state FIRST
             var expandedIds = new HashSet<string>();
             if (HierarchicalSystems != null)
             {
                 CollectExpandedIdsRecursive(HierarchicalSystems, expandedIds);
             }
 
-            // Force expansion of the selected item's branch if we are refreshing after an addition
+            // If something is selected, ensure it and its parents stay expanded
             if (SelectedVM != null)
             {
-                expandedIds.Add(SelectedVM.Id);
+                var walk = SelectedVM;
+                while (walk != null)
+                {
+                    expandedIds.Add(walk.Id);
+                    walk = walk.Parent;
+                }
             }
 
-            // 2. Reload the UI tree and the System dropdown
+            string savedSelectedId = SelectedVM?.Id;
+            string savedSysId = SelectedSystemFilter?.Id;
+            string savedProjId = SelectedProjectFilter?.Id;
+            string savedSubId = SelectedSubProjectFilter?.Id;
+
+            // 2. Reload the data
             LoadSystems(expandedIds);
             PopulateFilters();
 
-            // 3. Restore Selections
+            // 3. Restore Filters
             if (savedSysId != null)
             {
                 SelectedSystemFilter = SystemOptions.FirstOrDefault(x => x.Id == savedSysId);
@@ -897,14 +990,31 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 {
                     SelectedProjectFilter = ProjectOptions.FirstOrDefault(x => x.Id == savedProjId);
                     if (savedSubId != null)
-                    {
                         SelectedSubProjectFilter = SubProjectOptions.FirstOrDefault(x => x.Id == savedSubId);
-                    }
                 }
+            }
+
+            // 4. Restore Selection
+            if (savedSelectedId != null)
+            {
+                SelectedVM = FindViewModelByIdRecursive(HierarchicalSystems, savedSelectedId);
+                if (SelectedVM != null) SelectedVM.IsSelected = true;
             }
 
             OnPropertyChanged(nameof(IsEvmHoursBased));
             OnPropertyChanged(nameof(EvmDisplayMode));
+        }
+
+        // Add this helper to find the new VM instance after refresh
+        private SystemHierarchyItemViewModel FindViewModelByIdRecursive(IEnumerable<SystemHierarchyItemViewModel> items, string id)
+        {
+            foreach (var item in items)
+            {
+                if (item.Id == id) return item;
+                var found = FindViewModelByIdRecursive(item.Children, id);
+                if (found != null) return found;
+            }
+            return null;
         }
         // NEW HELPER: Traverses the current UI tree to find what's open
         private void CollectExpandedIdsRecursive(IEnumerable<SystemHierarchyItemViewModel> items, HashSet<string> expandedIds)
@@ -1079,6 +1189,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
 
             // 4. Cleanup & Save
             _dataService.RegenerateWbsValues(rootSystemId);
+            _dataService.MarkSystemDirty(rootSystemId);
             await _dataService.SaveDataAsync();
 
             // 5. Refresh the UI using state-preservation logic
@@ -1126,6 +1237,16 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
                 }
                 else
                 {
+                    // CASCADE CLEANUP: Remove managed project IDs and assignments
+                    var workItem = _dataService.GetWorkBreakdownItemById(vm.Id);
+                    if (workItem != null)
+                    {
+                        var deletedIds = new List<string> { workItem.Id };
+                        _dataService.CollectAllItemIdsRecursive(workItem.Children, deletedIds);
+                        _dataService.CleanupManagedProjectIds(deletedIds);
+                        _dataService.CleanupAssignmentsOnDelete(new List<WorkBreakdownItem> { workItem });
+                    }
+
                     var parent = FindParent(HierarchicalSystems, vm);
                     if (parent != null)
                     {
@@ -1288,6 +1409,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
 
             // 7. Persist & Fix WBS
             _dataService.RegenerateWbsValues(rootSystemId);
+            _dataService.MarkSystemDirty(rootSystemId);
             await _dataService.SaveDataAsync();
 
             // 8. Update UI State
@@ -1301,5 +1423,19 @@ namespace WpfResourceGantt.ProjectManagement.Features.SystemManagement
             ClearAllSelection();
         }
 
+        private async void ExecuteReplicateStructure()
+        {
+            var result = MessageBox.Show(
+                $"This will copy the task structure from '{SelectedVM.Name}' to ALL other subprojects in this system.\n\n" +
+                "Existing tasks in those subprojects' matching gates will be replaced. Checklist items will be copied, but assignments and predecessors will be cleared.\n\nContinue?",
+                "Confirm Replication", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await _dataService.ReplicateSubProjectStructureAsync(SelectedVM.Id);
+                RefreshData();
+                MessageBox.Show("Replication Complete.", "Success");
+            }
+        }
     }
 }

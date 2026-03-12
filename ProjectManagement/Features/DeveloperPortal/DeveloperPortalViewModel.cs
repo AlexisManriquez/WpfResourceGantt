@@ -186,6 +186,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.DeveloperPortal
             }
 
             // 2. Save to the database (just like you do in TaskDetails)
+            string portalSystemId = item.Id.Contains("|") ? item.Id.Split('|')[0] : item.Id;
+            _dataService.MarkSystemDirty(portalSystemId);
             await _dataService.SaveDataAsync();
 
 

@@ -50,7 +50,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
         public ICommand DeleteRowCommand { get; }
 
         public ICommand AddBlockToGateCommand { get; }
-
+        public ICommand ExpandAllCommand { get; }
+        public ICommand CollapseAllCommand { get; }
         public GateProgressViewModel(MainViewModel mainViewModel, WorkItem subProject, Action backNavigation, DataService dataService)
         {
             _mainViewModel = mainViewModel;
@@ -73,6 +74,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
             PasteSelectedCommand = new RelayCommand(ExecutePaste);
             DeleteSelectedCommand = new RelayCommand(ExecuteDeleteSelected);
             MoveRowCommand = new RelayCommand<ReorderParams>(ExecuteMoveRow);
+            ExpandAllCommand = new RelayCommand(ExpandAll);
+            CollapseAllCommand = new RelayCommand(CollapseAll);
             LoadData();
         }
 
@@ -627,6 +630,26 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
             };
             clear(RootRows);
         }
+        public WorkItem GetSelectedGateOrTask()
+        {
+            // Find the first selected row in the UI
+            var selectedRow = GetSelectedRows().FirstOrDefault();
+
+            if (selectedRow != null)
+            {
+                var current = selectedRow;
+
+                // If they selected a Block or Checklist Item, walk up the tree to find the parent Gate/Task
+                while (current != null && current.RowType != GateRowType.Gate && current.RowType != GateRowType.Task)
+                {
+                    current = current.Parent;
+                }
+
+                return current?.Model as WorkItem;
+            }
+
+            return null;
+        }
         private async ThreadingTask SaveAndRecalculate(WorkItem task)
         {
             if (task == null) return;
@@ -667,6 +690,21 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                 // Sync BOTH the Master and the UI Wrapper
                 masterItem.Progress = calculatedProgress;
                 task.Progress = calculatedProgress; // <--- THIS UPDATES THE TASK ROW TEXT
+
+                // MILESTONE AUTOMATION: When a milestone's checklist reaches 100%,
+                // automatically stamp ActualFinishDate. If it drops below, clear it.
+                if (masterItem.IsMilestone)
+                {
+                    if (calculatedProgress >= 1.0)
+                    {
+                        if (!masterItem.ActualFinishDate.HasValue)
+                            masterItem.ActualFinishDate = DateTime.Today;
+                    }
+                    else
+                    {
+                        masterItem.ActualFinishDate = null;
+                    }
+                }
             }
 
             // 4. UI ROLLUP (Updates the Gates)
@@ -676,6 +714,10 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
             string systemId = masterItem.Id.Split('|')[0];
             var rootSystem = _dataService.GetSystemById(systemId);
             if (rootSystem != null) rootSystem.RecalculateRollup();
+
+            // Mark the entire affected system subtree dirty so only these entities
+            // are written to the DB — not every entity across every system.
+            _dataService.MarkSystemDirty(systemId);
 
             // --- SNAPSHOT LOGIC (For Dashboard S-Curves) ---
             var today = DateTime.Today;
@@ -748,6 +790,27 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                 }
             }
             return result;
+        }
+        private void ExpandAll()
+        {
+            SetExpandedState(RootRows, true);
+        }
+
+        private void CollapseAll()
+        {
+            SetExpandedState(RootRows, false);
+        }
+
+        private void SetExpandedState(IEnumerable<GateRowViewModel> rows, bool isExpanded)
+        {
+            foreach (var row in rows)
+            {
+                if (row.Children != null && row.Children.Any())
+                {
+                    row.IsExpanded = isExpanded;
+                }
+                SetExpandedState(row.Children, isExpanded);
+            }
         }
     }
 
@@ -824,10 +887,12 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
                 if (Model is ProgressItem pi)
                 {
                     pi.IsCompleted = value;
+                    pi.IsDirty = true;
                 }
                 else if (Model is ProgressBlock pb)
                 {
                     pb.IsCompleted = value;
+                    pb.IsDirty = true;
                 }
 
                 OnPropertyChanged();
@@ -852,8 +917,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.Gantt
         private void UpdateModelName(string newName)
         {
             if (Model is WorkItem wi) wi.Name = newName;
-            else if (Model is ProgressBlock pb) pb.Name = newName;
-            else if (Model is ProgressItem pi) pi.Name = newName;
+            else if (Model is ProgressBlock pb) { pb.Name = newName; pb.IsDirty = true; }
+            else if (Model is ProgressItem pi)  { pi.Name = newName; pi.IsDirty = true; }
         }
 
         private double CalculateProgress()

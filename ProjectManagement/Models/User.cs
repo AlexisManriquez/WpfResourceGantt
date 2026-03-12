@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -9,6 +11,13 @@ namespace WpfResourceGantt.ProjectManagement.Models
 {
     public class User
     {
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool IsDirty { get; set; }
+
         [JsonPropertyName("id")]
         public string Id { get; set; }
 
@@ -30,6 +39,11 @@ namespace WpfResourceGantt.ProjectManagement.Models
         // This will only be populated for Section Chiefs
         [JsonPropertyName("managedProjectManagerIds")]
         public List<string>? ManagedProjectManagerIds { get; set; } = new List<string>();
+
+        // Tracks which Project IDs (Level 1 WBS items) this PM manages.
+        // Only relevant for ProjectManager role.
+        [JsonPropertyName("managedProjectIds")]
+        public List<string>? ManagedProjectIds { get; set; } = new List<string>();
 
         [JsonIgnore]
         public string GroupHeader

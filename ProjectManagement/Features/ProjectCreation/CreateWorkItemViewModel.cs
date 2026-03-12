@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using WpfResourceGantt.ProjectManagement.ViewModels;
-
+using static WpfResourceGantt.ProjectManagement.Models.WorkBreakdownItem;
 namespace WpfResourceGantt.ProjectManagement.Features.ProjectCreation
 {
     using WpfResourceGantt.ProjectManagement;
@@ -23,6 +23,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.ProjectCreation
         public string Name { get => _name; set { _name = value; OnPropertyChanged(); } }
         private string _number;
         public string Number { get => _number; set { _number = value; OnPropertyChanged(); } }
+        public bool IsDateEditable => _level >= 2; // Tasks and below
+        public bool IsDateVisible => _level > 0;   // Hide dates entirely for Systems
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public double Work { get; set; }
@@ -88,7 +90,18 @@ namespace WpfResourceGantt.ProjectManagement.Features.ProjectCreation
             Header = header;
             _removeAction = removeAction;
             Id = Guid.NewGuid().ToString(); // Temporary ID
-
+                                            // Only set default dates for leaf-level items (Level 2+)
+            if (level >= 2)
+            {
+                // SNAP TO BUSINESS DAY
+                StartDate = EnsureBusinessDay(DateTime.Today);
+                EndDate = WorkBreakdownItem.AddBusinessDays(StartDate.Value, 7);
+            }
+            else
+            {
+                StartDate = null;
+                EndDate = null;
+            }
             // Set dynamic labels
             if (level == 0) NumberLabel = "System Number";
             else if (level == 1) NumberLabel = "Project Number";

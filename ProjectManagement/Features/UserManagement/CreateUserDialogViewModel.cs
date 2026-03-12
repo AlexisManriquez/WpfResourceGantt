@@ -44,7 +44,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.UserManagement
         {
             // Use C#'s enum helpers to get all defined roles.
             IsEditMode = false;
-            AllRoles = Enum.GetValues(typeof(Role)).Cast<Role>();
+            AllRoles = Enum.GetValues(typeof(Role)).Cast<Role>().Where(r => r != Role.Administrator);
             // Set a default selection.
             SelectedRole = AllRoles.FirstOrDefault();
         }
@@ -53,7 +53,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.UserManagement
         public CreateUserDialogViewModel(User userToEdit)
         {
             IsEditMode = true;
-            AllRoles = Enum.GetValues(typeof(Role)).Cast<Role>();
+            AllRoles = Enum.GetValues(typeof(Role)).Cast<Role>().Where(r => r != Role.Administrator);
 
             _userId = userToEdit.Id;
             FullName = userToEdit.Name;

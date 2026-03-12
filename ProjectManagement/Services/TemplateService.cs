@@ -217,6 +217,7 @@ namespace WpfResourceGantt.ProjectManagement.Services
 
             // 2. Tell DataService to generate correct 1.1.2.1 style numbers for the whole tree
             _dataService.RegenerateWbsValues(systemId);
+            _dataService.MarkSystemDirty(systemId);
 
             // Persist everything to the database
             await _dataService.SaveDataAsync();

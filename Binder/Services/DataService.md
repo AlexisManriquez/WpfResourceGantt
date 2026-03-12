@@ -5,7 +5,7 @@ purpose: AI reference for the central data repository. The most critical service
 
 # DataService
 
-**File**: `ProjectManagement/DataService.cs` (~1740 lines)
+**File**: `ProjectManagement/DataService.cs` (~1840 lines)
 
 The central repository for **all data I/O**. Every ViewModel depends on this service.
 
@@ -21,8 +21,8 @@ The central repository for **all data I/O**. Every ViewModel depends on this ser
 
 | Constructor | Used by | Notes |
 |---|---|---|
-| `DataService(IEvmCalculationService)` | `MainViewModel` | Primary — full DI |
-| `DataService()` (parameterless) | `StartupViewModel` | Creates internal `EvmCalculationService`; login-only, no EVM needed |
+| `DataService(IEvmCalculationService, IScheduleCalculationService, IResourceAnalysisService)` | `MainViewModel` | Primary — full DI |
+| `DataService()` (parameterless) | `StartupViewModel` | Creates internal services; login-only |
 
 ## Key Method Groups
 
@@ -45,10 +45,28 @@ The central repository for **all data I/O**. Every ViewModel depends on this ser
 |--------|---------|
 | `AddSystem()` | Adds to `_projectData.Systems` |
 | `UpdateSystem()` | Updates in-memory SystemItem properties |
-| `DeleteSystemAsync()` | Removes from memory + triggers save |
+| `DeleteSystemAsync()` | Removes from memory + cascades cleanup of `ManagedProjectIds` + triggers save |
 | `GetSystemById()` | Finds by ID |
-| `GetSystemsForUser()` | Role-filtered system list |
+| `GetSystemsForUser()` | Role-filtered system list (see access control below) |
 | `CloneSystem()` | Deep clone with new IDs |
+
+### Role-Based System/Project Filtering
+| Method | Purpose |
+|--------|---------|
+| `GetSystemsForUser()` | Routes to appropriate filter based on user role |
+| `FilterProjectsForPM()` | Returns all systems, filters Level 1 children to PM's managed projects |
+| `FilterSystemsForDeveloper()` | Returns only systems containing developer's assigned tasks |
+
+**`FilterProjectsForPM` logic**: A PM "manages" a project if:
+1. Project ID is in `User.ManagedProjectIds`, **OR**
+2. PM has a `ResourceAssignment` on the project (Level 1 item)
+
+### Deletion Cascade Cleanup
+| Method | Purpose |
+|--------|---------|
+| `CleanupManagedProjectIds(List<string> deletedIds)` | Removes deleted IDs from all PM users' `ManagedProjectIds` |
+| `CollectAllItemIdsRecursive(items, ids)` | Recursively collects all descendant item IDs |
+| `CleanupAssignmentsOnDelete(items)` | Clears `Assignments` and `AssignedDeveloperId` on deleted branches |
 
 ### Work Item Operations
 | Method | Purpose |
@@ -86,6 +104,13 @@ The central repository for **all data I/O**. Every ViewModel depends on this ser
 | `GetResourceGanttDataAsync()` | Builds `ResourcePerson/ResourceTask` collections for [[Resource Gantt]] |
 | `GetUnassignedGanttTasksAsync()` | Finds leaf tasks with no assignments |
 
+### Project Office Symbol Derivation
+The project office symbol is derived by:
+1. Extracting the Level 1 project ID from the work item's ID
+2. Finding the PM who manages that project (via `User.ManagedProjectIds`)
+3. Finding the Section Chief who manages that PM (via `SectionChief.ManagedProjectManagerIds`)
+4. Using the Section Chief's `Section` as the project office symbol
+
 ### Backup
 | Method | Purpose |
 |--------|---------|
@@ -114,3 +139,5 @@ The central repository for **all data I/O**. Every ViewModel depends on this ser
 - [[WorkBreakdownItem]] — the primary entity managed
 - [[MainViewModel]] — primary consumer
 - [[CsvImportService]] — ACWP import pipeline (feeds snapshot ACWP)
+- [[User & Role]] — role-based access control matrix
+- [[Authentication & Deployment]] — login and auto-login flow

@@ -223,8 +223,12 @@ namespace WpfResourceGantt.ProjectManagement.Features.QuickTasks
             NewTaskStartDate = DateTime.Today;
             NewTaskEndDate = DateTime.Today.AddDays(1);
 
-            // Default to current user or first available
-            SelectedAssignee = AllUsers.FirstOrDefault(u => u.Id == _currentUser?.Id) ?? AllUsers.FirstOrDefault();
+            // 2. DEFAULT LOGIC: 
+            // Look for Alexis Manriquez first. 
+            // If not found, fall back to the current user, then the first person in the list.
+            SelectedAssignee = AllUsers.FirstOrDefault(u => u.Name.Equals("Alexis Manriquez", StringComparison.OrdinalIgnoreCase))
+                               ?? AllUsers.FirstOrDefault(u => u.Id == _currentUser?.Id)
+                               ?? AllUsers.FirstOrDefault();
 
             IsAddTaskModalOpen = true;
         }

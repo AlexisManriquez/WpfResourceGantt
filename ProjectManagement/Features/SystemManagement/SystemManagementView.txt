@@ -76,20 +76,39 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
-                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
-                        </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsFocused" Value="True">
-                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TacticalGoldBrush}"/>
-                                    <Setter Property="BorderThickness" TargetName="border" Value="1"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
+                        <Grid>
+                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
+                                <Grid>
+                                    <!-- This TextBlock shows the Tag content as a placeholder -->
+                                    <TextBlock x:Name="placeholder" 
+                                       Text="{TemplateBinding Tag}" 
+                                       Foreground="{StaticResource TacticalTextMutedBrush}" 
+                                       Padding="{TemplateBinding Padding}"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"
+                                       Visibility="Collapsed"
+                                       FontStyle="Italic"/>
+                                    <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <!-- Show placeholder only when Text is empty and not focused -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Text" Value=""/>
+                                    <Condition Property="IsFocused" Value="False"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="placeholder" Property="Visibility" Value="Visible"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TacticalGoldBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-
         <Style x:Key="ActionButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -130,6 +149,25 @@
                                     <Setter Property="Background" Value="#22FFD700"/>
                                     <!-- Light Gold -->
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding WasJustSaved}" Value="True">
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                            To="#3310B981" Duration="0:0:0.2"/>
+                                                <!-- Subtle Green Flash -->
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.EnterActions>
+                                    <DataTrigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                            To="Transparent" Duration="0:0:0.5"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.ExitActions>
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
@@ -153,8 +191,8 @@
                             <ColumnDefinition Width="90"  SharedSizeGroup="BurnCol"/>
                             <ColumnDefinition Width="90" SharedSizeGroup="BacCol"/>
                             <ColumnDefinition Width="90" SharedSizeGroup="BcwsCol"/>
-                            <ColumnDefinition Width="100" SharedSizeGroup="StartCol"/>
-                            <ColumnDefinition Width="100" SharedSizeGroup="EndCol"/>
+                            <ColumnDefinition Width="125" SharedSizeGroup="StartCol"/>
+                            <ColumnDefinition Width="125" SharedSizeGroup="EndCol"/>
                             <ColumnDefinition Width="60" SharedSizeGroup="FloatCol"/>
                             <ColumnDefinition Width="150" SharedSizeGroup="PredCol"/>
                             <ColumnDefinition Width="100" SharedSizeGroup="SnetCol"/>
@@ -162,9 +200,14 @@
                             <ColumnDefinition Width="130" SharedSizeGroup="AssigCol"/>
                             <ColumnDefinition Width="120" SharedSizeGroup="StatCol"/>
                         </Grid.ColumnDefinitions>
-
+                        <!-- Selection Indicator Bar (NEW) -->
+                        <Border Width="4" HorizontalAlignment="Left" Background="{StaticResource TacticalGoldBrush}" 
+            Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         <!-- Name Column -->
                         <StackPanel Orientation="Horizontal" Grid.Column="0" Margin="{Binding Level, Converter={StaticResource LevelToMarginConverter}}">
+                            <!-- Hierarchy Guide Line (NEW) -->
+                            <Border Width="1" Background="{StaticResource DividerBrush}" Margin="-10,5,10,5" 
+            Visibility="{Binding Level, Converter={StaticResource IntToVisibilityConverter}}"/>
                             <!-- Expander -->
                             <Button Style="{StaticResource ActionButtonStyle}" 
                                     Command="{Binding ToggleExpansionCommand}"
@@ -219,7 +262,7 @@
                                     <ComboBox ItemsSource="{Binding Source={x:Static models:WorkItemStatusHelper.AllWorkItemTypes}}" 
                                               SelectedItem="{Binding ItemType}" Width="80" Margin="0,0,5,0">
                                         <ComboBox.Style>
-                                            <Style TargetType="ComboBox">
+                                            <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                                 <Style.Triggers>
                                                     <!-- Show for Gates (3) and Tasks (4/5) -->
@@ -235,25 +278,36 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </ComboBox.Style>
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" Foreground="{StaticResource TacticalTextPrimaryBrush}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
                                     </ComboBox>
                                     <TextBox Text="{Binding LocalNumber, UpdateSourceTrigger=PropertyChanged}" 
-                                             Style="{StaticResource InlineTextBoxStyle}" 
-                                             Width="60" Tag="No" Margin="0,0,5,0"
-                                             Visibility="{Binding IsNumberApplicable, Converter={StaticResource BooleanToVisibilityConverter}}">
+         Style="{StaticResource InlineTextBoxStyle}" 
+         Width="80" Tag="Number" Margin="0,0,5,0"
+         Visibility="{Binding IsNumberApplicable, Converter={StaticResource BooleanToVisibilityConverter}}"
+         local:TextBoxExtensions.CommitOnEnter="{Binding SaveCommand}"
+         local:TextBoxExtensions.CommitOnLostFocus="{Binding SaveCommand}">
                                         <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="PreviewKeyDown"><local:InvokeDelegateCommandAction Command="{Binding SaveCommand}" Key="Enter"/></i:EventTrigger>
-                                            <i:EventTrigger EventName="PreviewKeyDown"><local:InvokeDelegateCommandAction Command="{Binding CancelEditCommand}" Key="Escape"/></i:EventTrigger>
-                                            <i:EventTrigger EventName="LostKeyboardFocus"><i:InvokeCommandAction Command="{Binding SaveCommand}"/></i:EventTrigger>
-                                            <i:EventTrigger EventName="Loaded"><cv:FocusAction/></i:EventTrigger>
+                                            <i:EventTrigger EventName="PreviewKeyDown">
+                                                <local:InvokeDelegateCommandAction Command="{Binding CancelEditCommand}" Key="Escape"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Loaded">
+                                                <cv:FocusAction/>
+                                            </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBox>
                                     <TextBox Text="{Binding LocalName, UpdateSourceTrigger=PropertyChanged}" 
-                                             Style="{StaticResource InlineTextBoxStyle}" 
-                                             Width="200" Tag="Name">
+         Style="{StaticResource InlineTextBoxStyle}" 
+         Width="220" Tag="Name"
+         local:TextBoxExtensions.CommitOnEnter="{Binding SaveCommand}"
+         local:TextBoxExtensions.CommitOnLostFocus="{Binding SaveCommand}">
                                         <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="PreviewKeyDown"><local:InvokeDelegateCommandAction Command="{Binding SaveCommand}" Key="Enter"/></i:EventTrigger>
-                                            <i:EventTrigger EventName="PreviewKeyDown"><local:InvokeDelegateCommandAction Command="{Binding CancelEditCommand}" Key="Escape"/></i:EventTrigger>
-                                            <i:EventTrigger EventName="LostKeyboardFocus"><i:InvokeCommandAction Command="{Binding SaveCommand}"/></i:EventTrigger>
+                                            <i:EventTrigger EventName="PreviewKeyDown">
+                                                <local:InvokeDelegateCommandAction Command="{Binding CancelEditCommand}" Key="Escape"/>
+                                            </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBox>
                                 </StackPanel>
@@ -263,18 +317,23 @@
                         <!-- Start Date Column -->
                         <Grid Grid.Column="5" VerticalAlignment="Center" Margin="10,0">
                             <TextBlock Text="{Binding StartDate, StringFormat=MM/dd/yyyy, TargetNullValue=--}" 
-                                       Style="{StaticResource CellTextStyle}" 
-                                       Foreground="{StaticResource TacticalTextMutedBrush}"
-                                       Visibility="{Binding IsEditingStartDate, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}">
+               Style="{StaticResource CellTextStyle}" 
+               Foreground="{StaticResource TacticalTextMutedBrush}"
+               Visibility="{Binding IsEditingStartDate, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}">
                                 <TextBlock.InputBindings>
                                     <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding EditStartDateCommand}"/>
                                 </TextBlock.InputBindings>
                             </TextBlock>
+
                             <DatePicker SelectedDate="{Binding StartDate}" 
-                                        Visibility="{Binding IsEditingStartDate, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        Style="{StaticResource TacticalDatePickerStyle}">
+                Visibility="{Binding IsEditingStartDate, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Style="{StaticResource TacticalDatePickerStyle}"
+                                        local:TextBoxExtensions.CommitOnLostFocus="{Binding SaveCommand}"
+            local:TextBoxExtensions.CommitOnEnter="{Binding SaveCommand}">
                                 <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="SelectedDateChanged"><local:InvokeDelegateCommandAction Command="{Binding SaveCommand}"/></i:EventTrigger>
+                                    <i:EventTrigger EventName="CalendarClosed">
+                                        <i:InvokeCommandAction Command="{Binding SaveCommand}"/>
+                                    </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </DatePicker>
                         </Grid>
@@ -291,9 +350,13 @@
                             </TextBlock>
                             <DatePicker SelectedDate="{Binding EndDate}" 
                                         Visibility="{Binding IsEditingEndDate, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        Style="{StaticResource TacticalDatePickerStyle}">
+                                        Style="{StaticResource TacticalDatePickerStyle}"
+                                        local:TextBoxExtensions.CommitOnLostFocus="{Binding SaveCommand}"
+            local:TextBoxExtensions.CommitOnEnter="{Binding SaveCommand}">
                                 <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="SelectedDateChanged"><local:InvokeDelegateCommandAction Command="{Binding SaveCommand}"/></i:EventTrigger>
+                                    <i:EventTrigger EventName="CalendarClosed">
+                                        <i:InvokeCommandAction Command="{Binding SaveCommand}"/>
+                                    </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </DatePicker>
                         </Grid>
@@ -318,11 +381,10 @@
                                 </TextBlock.InputBindings>
                             </TextBlock>
                             <TextBox Visibility="{Binding IsEditingPredecessors, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                     Text="{Binding PredecessorEditValue, UpdateSourceTrigger=LostFocus}"
-                                     Style="{StaticResource InlineTextBoxStyle}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="LostFocus"><i:InvokeCommandAction Command="{Binding SaveCommand}"/></i:EventTrigger>
-                                </i:Interaction.Triggers>
+         Text="{Binding PredecessorEditValue, UpdateSourceTrigger=LostFocus}"
+         Style="{StaticResource InlineTextBoxStyle}"
+         local:TextBoxExtensions.CommitOnEnter="{Binding SaveCommand}"
+         local:TextBoxExtensions.CommitOnLostFocus="{Binding SaveCommand}">
                             </TextBox>
                         </Grid>
 
@@ -336,9 +398,13 @@
                             </TextBlock>
                             <DatePicker Visibility="{Binding IsEditingStartNoEarlierThan, Converter={StaticResource BooleanToVisibilityConverter}}"
                                         SelectedDate="{Binding StartNoEarlierThan}"
-                                        Style="{StaticResource TacticalDatePickerStyle}">
+                                        Style="{StaticResource TacticalDatePickerStyle}"
+                                        local:TextBoxExtensions.CommitOnLostFocus="{Binding SaveCommand}"
+            local:TextBoxExtensions.CommitOnEnter="{Binding SaveCommand}">
                                 <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="SelectedDateChanged"><i:InvokeCommandAction Command="{Binding SaveCommand}"/></i:EventTrigger>
+                                    <i:EventTrigger EventName="CalendarClosed">
+                                        <i:InvokeCommandAction Command="{Binding SaveCommand}"/>
+                                    </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </DatePicker>
                         </Grid>
@@ -353,16 +419,10 @@
                             </TextBlock>
 
                             <TextBox Visibility="{Binding IsEditingDuration, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                     Text="{Binding DurationDays, UpdateSourceTrigger=LostFocus}" 
-                                     Style="{StaticResource InlineTextBoxStyle}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="PreviewKeyDown">
-                                        <local:InvokeDelegateCommandAction Command="{Binding SaveCommand}" Key="Enter"/>
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="LostFocus">
-                                        <i:InvokeCommandAction Command="{Binding SaveCommand}"/>
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
+         Text="{Binding DurationDays, UpdateSourceTrigger=LostFocus}" 
+         Style="{StaticResource InlineTextBoxStyle}"
+         local:TextBoxExtensions.CommitOnEnter="{Binding SaveCommand}"
+         local:TextBoxExtensions.CommitOnLostFocus="{Binding SaveCommand}">
                             </TextBox>
                         </Grid>
 
@@ -376,13 +436,10 @@
                             </TextBlock>
 
                             <TextBox Visibility="{Binding IsEditingWork, Converter={StaticResource BooleanToVisibilityConverter}}"
-             Text="{Binding Work, UpdateSourceTrigger=LostFocus}" 
-             Style="{StaticResource InlineTextBoxStyle}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="LostFocus">
-                                        <i:InvokeCommandAction Command="{Binding SaveCommand}"/>
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
+         Text="{Binding Work, UpdateSourceTrigger=LostFocus}" 
+         Style="{StaticResource InlineTextBoxStyle}"
+         local:TextBoxExtensions.CommitOnEnter="{Binding SaveCommand}"
+         local:TextBoxExtensions.CommitOnLostFocus="{Binding SaveCommand}">
                             </TextBox>
                         </Grid>
                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
@@ -468,30 +525,77 @@
                             </TextBlock>
                         </Grid>
                         <!-- Assignee Column (Interactive) -->
+                        <!-- Assignee Column -->
                         <Grid Grid.Column="11" Margin="10,0">
                             <StackPanel Orientation="Horizontal">
-                                <Button Style="{StaticResource ActionButtonStyle}" Command="{Binding AssignDeveloperCommand}" 
-                                        ToolTip="Assign Resource" Margin="0,0,8,0">
-                                    <TextBlock Text="👤" FontSize="14" Foreground="{StaticResource TacticalGoldBrush}"/>
+                                <!-- CHANGE: Hide button for Level 0 -->
+                                <Button Command="{Binding AssignDeveloperCommand}" 
+                ToolTip="Assign Resource" Margin="0,0,8,0">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Level}" Value="0">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <Path Data="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" 
+                  Fill="{StaticResource TacticalGoldBrush}" Stretch="Uniform" Width="14" Height="14"/>
                                 </Button>
-                                <TextBlock Text="⚠️ " Visibility="{Binding IsOverAllocated, Converter={StaticResource BooleanToVisibilityConverter}}" 
-                                           Foreground="#FF4545" VerticalAlignment="Center" ToolTip="Resource Over-Allocation detected"/>
+
+                                <!-- CHANGE: Ensure warning is hidden for Level 0 -->
+                                <TextBlock Text="⚠️ " Foreground="#FF4545" VerticalAlignment="Center" ToolTip="Resource Over-Allocation detected">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsOverAllocated}" Value="True"/>
+                                                        <Condition Binding="{Binding Level}" Value="1"/>
+                                                        <!-- Or higher -->
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </MultiDataTrigger>
+                                                <!-- Ensure it doesn't show for Level 0 -->
+                                                <DataTrigger Binding="{Binding Level}" Value="0">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
                                 <TextBlock Text="{Binding Assignee}" Style="{StaticResource CellTextStyle}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="110"/>
                             </StackPanel>
                         </Grid>
-
                         <!-- Status Column -->
                         <Grid Grid.Column="12" VerticalAlignment="Center" Margin="10,0">
-                            <!-- Display Mode -->
-                            <Border CornerRadius="12" Padding="12,4" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                    Visibility="{Binding IsEditingStatus, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}">
+
+                            <!-- 1. The "Pill" (Only for Levels > 0 and when not editing) -->
+                            <Border CornerRadius="12" Padding="12,4" HorizontalAlignment="Left" VerticalAlignment="Center">
                                 <Border.Style>
                                     <Style TargetType="Border">
+                                        <!-- Default State -->
+                                        <Setter Property="Visibility" Value="Visible"/>
                                         <Setter Property="Background" Value="{StaticResource AppBackgroundBrush}"/>
                                         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
                                         <Setter Property="BorderThickness" Value="1"/>
                                         <Setter Property="Cursor" Value="Hand"/>
+
                                         <Style.Triggers>
+                                            <!-- CRITICAL: Hide if it's a System (Level 0) -->
+                                            <DataTrigger Binding="{Binding Level}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+
+                                            <!-- Hide if currently editing the cell -->
+                                            <DataTrigger Binding="{Binding IsEditingStatus}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+
+                                            <!-- Color logic (unchanged) -->
                                             <DataTrigger Binding="{Binding Status}" Value="Active">
                                                 <Setter Property="Background" Value="{StaticResource StatusBusyBrush}"/>
                                                 <Setter Property="TextElement.Foreground" Value="{StaticResource TextInverseBrush}"/>
@@ -505,11 +609,26 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
+
                                 <Border.InputBindings>
                                     <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding EditStatusCommand}"/>
                                 </Border.InputBindings>
-                                <TextBlock Text="{Binding StatusSummary}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="{Binding StatusSummary}" FontSize="12" FontWeight="SemiBold"/>
                             </Border>
+
+                            <TextBlock Text="--" HorizontalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource CellTextStyle}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Setter Property="Foreground" Value="{StaticResource TacticalTextMutedBrush}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Level}" Value="0">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
 
                             <ComboBox Visibility="{Binding IsEditingStatus, Converter={StaticResource BooleanToVisibilityConverter}}"
                                       SelectedItem="{Binding Status}" 
@@ -537,15 +656,23 @@
                 </Border>
 
                 <!-- Inline Add Form -->
-                <Border Visibility="{Binding IsAddingChild, Converter={StaticResource BooleanToVisibilityConverter}}" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource DividerBrush}" BorderThickness="0,0,0,1">
+                <Border Visibility="{Binding IsAddingChild, Converter={StaticResource BooleanToVisibilityConverter}}" Background="#1A1D21" BorderBrush="{StaticResource TacticalGoldBrush}" 
+        BorderThickness="0,1,0,1" 
+        Margin="0,2">
+                    <i:Interaction.Triggers>
+                        <!-- When the user triggers 'Add Child', automatically expand the parent so they see the context -->
+                        <i:DataTrigger Binding="{Binding IsAddingChild}" Value="True">
+                            <i:ChangePropertyAction TargetObject="{Binding}" PropertyName="IsExpanded" Value="True"/>
+                        </i:DataTrigger>
+                    </i:Interaction.Triggers>
                     <Grid Height="60" MinWidth="1300">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" SharedSizeGroup="NameCol"/>
                             <ColumnDefinition Width="80" SharedSizeGroup="WorkCol"/>
                             <ColumnDefinition Width="90" SharedSizeGroup="BacCol"/>
                             <ColumnDefinition Width="90" SharedSizeGroup="BcwsCol"/>
-                            <ColumnDefinition Width="110" SharedSizeGroup="StartCol"/>
-                            <ColumnDefinition Width="110" SharedSizeGroup="EndCol"/>
+                            <ColumnDefinition Width="125" SharedSizeGroup="StartCol"/>
+                            <ColumnDefinition Width="125" SharedSizeGroup="EndCol"/>
                             <ColumnDefinition Width="60" SharedSizeGroup="FloatCol"/>
                             <ColumnDefinition Width="150" SharedSizeGroup="PredCol"/>
                             <ColumnDefinition Width="110" SharedSizeGroup="SnetCol"/>
@@ -558,14 +685,23 @@
                         <!-- Col 0: Name and Type -->
                         <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="{Binding Level, Converter={StaticResource LevelToMarginConverter}, ConverterParameter=Child}">
                             <ComboBox ItemsSource="{Binding Source={x:Static models:WorkItemStatusHelper.AllWorkItemTypes}}" 
-                                      SelectedItem="{Binding NewChildItemType}" Width="80" Margin="0,0,10,0"/>
+                                      SelectedItem="{Binding NewChildItemType}" Width="100" Margin="0,0,10,0"
+                                      Style="{StaticResource {x:Type ComboBox}}"/>
                             <TextBlock Text="{Binding CurrentNumberPrefix}" Foreground="{StaticResource TacticalTextMutedBrush}" VerticalAlignment="Center" Margin="0,0,2,0" Visibility="{Binding IsChildNumberApplicable, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                            <TextBox Style="{StaticResource InlineTextBoxStyle}" Text="{Binding NewChildNumber, UpdateSourceTrigger=PropertyChanged}" Width="50" Tag="000" Margin="0,0,5,0" Visibility="{Binding IsChildNumberApplicable, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                            <TextBox Style="{StaticResource InlineTextBoxStyle}" Text="{Binding NewChildName, UpdateSourceTrigger=PropertyChanged}" Width="120" Tag="Item name..."/>
+                            <TextBox Style="{StaticResource InlineTextBoxStyle}" Text="{Binding NewChildNumber, UpdateSourceTrigger=PropertyChanged}" Width="80" Tag="Number" Margin="0,0,5,0" Visibility="{Binding IsChildNumberApplicable, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <TextBox Style="{StaticResource InlineTextBoxStyle}" Text="{Binding NewChildName, UpdateSourceTrigger=PropertyChanged}" Width="180" Tag="Name" local:TextBoxExtensions.CommitOnEnter="{Binding ConfirmAddChildCommand}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Loaded">
+                                        <cv:FocusAction/>
+                                        <!-- You already have FocusAction defined in your resources! -->
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </TextBox>
                             <ComboBox ItemsSource="{Binding ScheduleModeOptions}" 
                                       SelectedItem="{Binding NewChildScheduleMode}" 
                                       Visibility="{Binding IsAddingProjectMode, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                      Width="90" Margin="10,0,0,0"/>
+                                      Width="115" Margin="10,0,0,0"
+                                      Style="{StaticResource {x:Type ComboBox}}"/>
                         </StackPanel>
 
                         <!-- Col 1: Work -->
@@ -630,6 +766,12 @@
                         <!-- Col 12: Action Buttons -->
                         <StackPanel Grid.Column="12" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
                             <Button Content="Add" Background="{StaticResource PrimaryActionBrush}" Foreground="{StaticResource TextInverseBrush}" Padding="12,4" Command="{Binding ConfirmAddChildCommand}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <!-- This forces the parent to expand so the new child is visible -->
+                                        <i:ChangePropertyAction TargetObject="{Binding}" PropertyName="IsExpanded" Value="True"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
                                 <Button.Resources>
                                     <Style TargetType="Border">
                                         <Setter Property="CornerRadius" Value="6"/>
@@ -650,7 +792,13 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid Margin="20, 10" Grid.IsSharedSizeScope="True">
+    <Grid Margin="20, 10" Grid.IsSharedSizeScope="True" Focusable="True" local:TextBoxExtensions.ClearFocusOnClick="True">
+        <i:Interaction.Triggers>
+            <!-- Catch mouse release anywhere in the view -->
+            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                <i:InvokeCommandAction Command="{Binding EndDragSelectionCommand}"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
         <Grid.InputBindings>
             <KeyBinding Key="C" Modifiers="Ctrl" Command="{Binding CopySelectedCommand}"/>
             <KeyBinding Key="V" Modifiers="Ctrl" Command="{Binding PasteSelectedCommand}"/>
@@ -874,8 +1022,8 @@
                                 <ColumnDefinition Width="90"  SharedSizeGroup="BurnCol"/>
                                 <ColumnDefinition Width="90" SharedSizeGroup="BacCol"/>
                                     <ColumnDefinition Width="90" SharedSizeGroup="BcwsCol"/>
-                                    <ColumnDefinition Width="110" SharedSizeGroup="StartCol"/>
-                                    <ColumnDefinition Width="110" SharedSizeGroup="EndCol"/>
+                                <ColumnDefinition Width="125" SharedSizeGroup="StartCol"/>
+                                <ColumnDefinition Width="125" SharedSizeGroup="EndCol"/>
                                     <ColumnDefinition Width="60" SharedSizeGroup="FloatCol"/>
                             <ColumnDefinition Width="150" SharedSizeGroup="PredCol"/>
                                     <ColumnDefinition Width="110" SharedSizeGroup="SnetCol"/>
@@ -939,8 +1087,8 @@
                                                Width="24" Height="24"
                                                Margin="0,0,12,0"/>
 
-                                        <TextBox Style="{StaticResource InlineTextBoxStyle}" Text="{Binding NewSystemNumber, UpdateSourceTrigger=PropertyChanged}" Width="60" Tag="000" Margin="0,0,5,0"/>
-                                        <TextBox Style="{StaticResource InlineTextBoxStyle}" Text="{Binding NewSystemName, UpdateSourceTrigger=PropertyChanged}" Width="190" Tag="System name..."/>
+                                        <TextBox Style="{StaticResource InlineTextBoxStyle}" Text="{Binding NewSystemNumber, UpdateSourceTrigger=PropertyChanged}" Width="80" Tag="Number" Margin="0,0,5,0"/>
+                                        <TextBox Style="{StaticResource InlineTextBoxStyle}" Text="{Binding NewSystemName, UpdateSourceTrigger=PropertyChanged}" Width="250" Tag="Name" local:TextBoxExtensions.CommitOnEnter="{Binding ConfirmAddSystemCommand}"/>
                                         <Button Content="Add System" Margin="15,0,10,0" Background="{StaticResource PrimaryActionBrush}" Foreground="{StaticResource TextInverseBrush}" Padding="15,6" Command="{Binding ConfirmAddSystemCommand}">
                                             <Button.Resources>
                                                 <Style TargetType="Border">
@@ -949,7 +1097,7 @@
                                             </Button.Resources>
                                         </Button>
                                         <Button Style="{StaticResource ActionButtonStyle}" Command="{Binding CancelAddSystemCommand}" VerticalAlignment="Center">
-                                            <TextBlock Text="•" FontSize="18" Foreground="{StaticResource TacticalTextMutedBrush}"/>
+                                            <TextBlock Text="✕" FontSize="16" Foreground="{StaticResource TacticalTextMutedBrush}"/>
                                         </Button>
                                     </StackPanel>
                                 </Grid>

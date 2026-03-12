@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -9,6 +11,13 @@ namespace WpfResourceGantt.ProjectManagement.Models
 {
     public class ProgressItem
     {
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool IsDirty { get; set; }
+
         public int Sequence { get; set; }
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -21,6 +30,13 @@ namespace WpfResourceGantt.ProjectManagement.Models
     }
     public class ProgressBlock
     {
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool IsDirty { get; set; }
+
         public int Sequence { get; set; }
         [JsonPropertyName("id")]
         public string Id { get; set; }

@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
 using System.Windows;
 using System.Windows.Input;
 using WpfResourceGantt.ProjectManagement.Features.Analytics;
@@ -186,6 +187,12 @@ namespace WpfResourceGantt.ProjectManagement
         }
 
         // === NEW: Resource Gantt & Analytics Contexts ===
+        private DashboardViewModel _dashboardContext;
+        public DashboardViewModel DashboardContext
+        {
+            get => _dashboardContext;
+            private set { _dashboardContext = value; OnPropertyChanged(); }
+        }
         public ResourceGanttViewModel GanttContext { get; set; }
         public AnalyticsViewModel AnalyticsContext { get; set; }
 
@@ -432,9 +439,29 @@ namespace WpfResourceGantt.ProjectManagement
             // New Save Command
             SaveCommand = new RelayCommand(async () =>
             {
-                await _dataService.SaveDataAsync();
-                // Optional: Provide a visual indicator instead of a message box later
-                MessageBox.Show("Project Data Saved Successfully", "Tactical Save", MessageBoxButton.OK, MessageBoxImage.Information);
+                try
+                {
+                    await _dataService.SaveDataAsync();
+                }
+                // Use the EF Core specific exception type
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    var result = MessageBox.Show(
+                        "The database detected a conflict (data was modified in another view). " +
+                        "Would you like to reload the latest data and try again?",
+                        "Save Conflict",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await RefreshFromDatabase();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Save Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             });
             // Subscribe to data changes
             _dataService.DataChanged += OnDataChanged;
@@ -693,9 +720,22 @@ namespace WpfResourceGantt.ProjectManagement
 
             if (CurrentViewModel is GateProgressViewModel gateVm)
             {
-                contextItem = _dataService.GetWorkBreakdownItemById(gateVm.SubProject.Id);
+                // 1. Try to get the actively selected row from the Gate Progress UI
+                var selectedItem = gateVm.GetSelectedGateOrTask();
+
+                if (selectedItem != null)
+                {
+                    // If they selected a row, pass THAT item to the dialog
+                    contextItem = _dataService.GetWorkBreakdownItemById(selectedItem.Id);
+                }
+                else
+                {
+                    // Fallback: If nothing is selected, default to the root SubProject
+                    contextItem = _dataService.GetWorkBreakdownItemById(gateVm.SubProject.Id);
+                }
             }
 
+            // 2. Open the dialog passing the specific context item
             var dialogVm = new ImportTestBlocksDialogViewModel(_dataService, contextItem);
 
             dialogVm.OnCloseRequest += (success) =>
@@ -739,7 +779,19 @@ namespace WpfResourceGantt.ProjectManagement
 
         private void ShowDashboardView()
         {
-            CurrentViewModel = new DashboardViewModel(_dataService, CurrentUser);
+            if (DashboardContext == null)
+            {
+                // First time loading: Create the instance
+                DashboardContext = new DashboardViewModel(_dataService, CurrentUser, this);
+            }
+            else
+            {
+                // Subsequent loads: Reuse the instance so it remembers where you drilled down to,
+                // and refresh the data in case you updated progress in the Gate view.
+                DashboardContext.Refresh();
+            }
+
+            CurrentViewModel = DashboardContext;
         }
 
         private void ShowSimulationView()
@@ -897,6 +949,8 @@ namespace WpfResourceGantt.ProjectManagement
                     }
 
                     // 4. Save and Refresh
+                    string assignSystemId = fullWorkItem.Id.Contains("|") ? fullWorkItem.Id.Split('|')[0] : fullWorkItem.Id;
+                    _dataService.MarkSystemDirty(assignSystemId);
                     await _dataService.SaveDataAsync();
                     onAssigned?.Invoke();
                 }
@@ -978,6 +1032,7 @@ namespace WpfResourceGantt.ProjectManagement
                 if (fullSystem != null)
                 {
                     _dataService.CalculateAndSetBAC(fullSystem);
+                    _dataService.MarkSystemDirty(fullSystem.Id);
                     await _dataService.SaveDataAsync();
                     (CurrentViewModel as GanttViewModel)?.RefreshGanttView();
                     MessageBox.Show("Baseline has been set successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -1025,6 +1080,10 @@ namespace WpfResourceGantt.ProjectManagement
             {
                 gantt.ExpandAllCommand.Execute(null);
             }
+            else if (CurrentViewModel is GateProgressViewModel gate)
+            {
+                gate.ExpandAllCommand.Execute(null);
+            }
         }
 
         private void CollapseAll()
@@ -1032,6 +1091,10 @@ namespace WpfResourceGantt.ProjectManagement
             if (CurrentViewModel is GanttViewModel gantt)
             {
                 gantt.CollapseAllCommand.Execute(null);
+            }
+            else if (CurrentViewModel is GateProgressViewModel gate)
+            {
+                gate.CollapseAllCommand.Execute(null);
             }
         }
 
@@ -1188,7 +1251,7 @@ namespace WpfResourceGantt.ProjectManagement
                 MessageBox.Show($"Error preparing import: {ex.Message}");
             }
         }
-        
+
         /// <summary>
         /// Uses Microsoft.Office.Interop.Excel to save the active sheet as a CSV.
         /// Warning: Requires Excel to be installed on the machine.
@@ -1228,9 +1291,32 @@ namespace WpfResourceGantt.ProjectManagement
                 }
             }
 
+            // --- NEW LOGIC: Exclude blank rows ---
+            // We do this here (after Excel closes) to ensure the file lock is released.
+            if (File.Exists(tempCsv))
+            {
+                var cleanedLines = new List<string>();
+
+                foreach (var line in File.ReadLines(tempCsv))
+                {
+                    // Excel exports empty formatted rows as a string of commas (e.g., ",,,,,,")
+                    // We temporarily strip commas, quotes, and whitespace to see if any actual text remains
+                    string checkLine = line.Replace(",", "").Replace("\"", "").Trim();
+
+                    // Only keep the row if it contains actual data
+                    if (!string.IsNullOrWhiteSpace(checkLine))
+                    {
+                        cleanedLines.Add(line); // Add the ORIGINAL line, keeping the commas
+                    }
+                }
+
+                // Overwrite the temp file with the cleaned data
+                File.WriteAllLines(tempCsv, cleanedLines);
+            }
+
             return tempCsv;
 #else
-            throw new NotSupportedException("Excel import is disabled in this build configuration. To enable, set <UseMsProject>true</UseMsProject> in the .csproj file.");
+    throw new NotSupportedException("Excel import is disabled in this build configuration. To enable, set <UseMsProject>true</UseMsProject> in the .csproj file.");
 #endif
         }
         private async void RefreshData()

@@ -1,10 +1,19 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace WpfResourceGantt.ProjectManagement.Models
 {
     public class ProgressHistoryItem
     {
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool IsDirty { get; set; }
+
         [JsonPropertyName("id")]
         public string Id { get; set; } = Guid.NewGuid().ToString();
 

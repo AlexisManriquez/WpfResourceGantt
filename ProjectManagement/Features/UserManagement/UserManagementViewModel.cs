@@ -39,7 +39,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.UserManagement
         public UserManagementViewModel(DataService dataService)
         {
             _dataService = dataService;
-            Users = new ObservableCollection<User>(_dataService.AllUsers);
+            Users = new ObservableCollection<User>(_dataService.AllUsers.Where(u => u.Role != Role.Administrator));
 
             AddUserCommand = new RelayCommand(AddUser);
             EditUserCommand = new RelayCommand(EditUser, () => SelectedUser != null);
@@ -58,7 +58,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.UserManagement
 
         public void RefreshUserList()
         {
-            var updatedList = _dataService.AllUsers.ToList();
+            var updatedList = _dataService.AllUsers.Where(u => u.Role != Role.Administrator).ToList();
 
             // Sync the ObservableCollection instead of creating a new one 
             // to preserve any active bindings or selections in the DataGrid.

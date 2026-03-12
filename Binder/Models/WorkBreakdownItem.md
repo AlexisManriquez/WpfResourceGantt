@@ -106,9 +106,11 @@ A `ViewModelBase` subclass wrapping `WorkBreakdownItem` with `INotifyPropertyCha
 - `ProgressBlocks` ObservableCollection
 - `IsExpanded` — tree expansion state
 
-## Helper Methods
-- `GetBusinessDaysSpan(start, end)` — Inclusive weekday count (Mon–Fri)
-- `AddBusinessDays(start, days)` — Adds N business days (**supports negative values for backward pass**)
+## Simulation Mode Behavior
+When being processed by the **Temporal Sandbox** (`SimulationViewModel.cs`):
+- **Ad-hoc Extension**: Duration is automatically extended if `Progress < 1.0` and `StatusDate > EndDate`.
+- **Ad-hoc Shrink**: Duration is automatically shrunk to `ActualFinishDate` if `Progress >= 1.0`.
+- **Original Duration Tracking**: The simulation engine maintains a separate dictionary to track baseline durations before these ad-hoc sandbox modifications.
 
 ## Related Pages
 - [[Data Hierarchy]] — tree structure and leaf vs summary rules

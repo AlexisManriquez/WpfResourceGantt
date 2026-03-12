@@ -39,6 +39,11 @@ namespace WpfResourceGantt.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -128,6 +133,11 @@ namespace WpfResourceGantt.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Sequence")
                         .HasColumnType("int");
 
@@ -165,6 +175,11 @@ namespace WpfResourceGantt.Migrations
                         .HasColumnType("float")
                         .HasAnnotation("Relational:JsonPropertyName", "expectedProgress");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<string>("WorkItemId")
                         .HasColumnType("nvarchar(450)");
 
@@ -194,6 +209,11 @@ namespace WpfResourceGantt.Migrations
                     b.Property<string>("ProgressBlockId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Sequence")
                         .HasColumnType("int");
 
@@ -221,6 +241,11 @@ namespace WpfResourceGantt.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("Relational:JsonPropertyName", "role");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<string>("WorkItemId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)")
@@ -245,9 +270,10 @@ namespace WpfResourceGantt.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
-                    b.Property<string>("ProjectManagerId")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "projectManagerId");
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<int>("Sequence")
                         .HasColumnType("int");
@@ -420,6 +446,10 @@ namespace WpfResourceGantt.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasAnnotation("Relational:JsonPropertyName", "hourlyRate");
 
+                    b.Property<string>("ManagedProjectIds")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "managedProjectIds");
+
                     b.Property<string>("ManagedProjectManagerIds")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "managedProjectManagerIds");
@@ -431,6 +461,11 @@ namespace WpfResourceGantt.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("int")
                         .HasAnnotation("Relational:JsonPropertyName", "role");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<string>("Section")
                         .HasColumnType("nvarchar(max)")
@@ -540,6 +575,11 @@ namespace WpfResourceGantt.Migrations
                     b.Property<double>("Progress")
                         .HasColumnType("float")
                         .HasAnnotation("Relational:JsonPropertyName", "progress");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<int>("ScheduleMode")
                         .HasColumnType("int")

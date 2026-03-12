@@ -1,3 +1,516 @@
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Black.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-BlackItalic.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Bold.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-BoldItalic.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-ExtraBold.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-ExtraBoldItalic.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-ExtraLight.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-ExtraLightItalic.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Italic.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Light.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-LightItalic.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Medium.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-MediumItalic.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Regular.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-SemiBold.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-SemiBoldItalic.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Thin.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-ThinItalic.ttf
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\OFL.txt
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\WpfResourceGantt.exe
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\appsettings.json
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\WpfResourceGantt.deps.json
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\WpfResourceGantt.runtimeconfig.json
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\WpfResourceGantt.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\WpfResourceGantt.pdb
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Azure.Core.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Azure.Identity.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Humanizer.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LiveCharts.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LiveCharts.Wpf.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Bcl.AsyncInterfaces.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.CodeAnalysis.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.CodeAnalysis.CSharp.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.CodeAnalysis.CSharp.Workspaces.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.CodeAnalysis.Workspaces.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Data.SqlClient.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.EntityFrameworkCore.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.EntityFrameworkCore.Design.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.EntityFrameworkCore.Relational.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.EntityFrameworkCore.SqlServer.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Caching.Abstractions.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Caching.Memory.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Configuration.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Configuration.Abstractions.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Configuration.FileExtensions.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Configuration.Json.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.DependencyInjection.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.DependencyModel.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.FileProviders.Abstractions.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.FileProviders.Physical.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.FileSystemGlobbing.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Logging.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Logging.Abstractions.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Options.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Primitives.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Identity.Client.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Identity.Client.Extensions.Msal.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Abstractions.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Logging.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Protocols.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Tokens.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.SqlServer.Server.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Xaml.Behaviors.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Mono.TextTemplating.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\QuestPDF.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.ClientModel.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Composition.AttributedModel.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Composition.Convention.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Composition.Hosting.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Composition.Runtime.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Composition.TypedParts.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.IdentityModel.Tokens.Jwt.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.IO.Pipelines.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Memory.Data.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Runtime.Caching.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\cs\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\de\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\es\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\fr\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\it\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ja\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ko\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pl\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pt-BR\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ru\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\tr\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hans\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hant\Microsoft.CodeAnalysis.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\cs\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\de\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\es\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\fr\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\it\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ja\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ko\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pl\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ru\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\tr\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\de\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\es\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\fr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\it\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ja\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ko\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pl\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pt-BR\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ru\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\tr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hans\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hant\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\cs\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\de\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\es\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\fr\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\it\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ja\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ko\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pl\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pt-BR\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ru\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\unix\lib\net6.0\Microsoft.Data.SqlClient.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win\lib\net6.0\Microsoft.Data.SqlClient.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-arm64\native\libQuestPdfSkia.so
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-arm64\native\libqpdf.so
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-musl-x64\native\libQuestPdfSkia.so
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-musl-x64\native\libqpdf.so
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-x64\native\libQuestPdfSkia.so
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-x64\native\libqpdf.so
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\osx-arm64\native\libQuestPdfSkia.dylib
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\osx-arm64\native\libqpdf.dylib
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\osx-x64\native\libQuestPdfSkia.dylib
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\osx-x64\native\libqpdf.dylib
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\QuestPdfSkia.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\libgcc_s_seh-1.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\libstdc++-6.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\libwinpthread-1.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\qpdf.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\zlib1.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\QuestPdfSkia.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\libgcc_s_dw2-1.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\libstdc++-6.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\libwinpthread-1.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\qpdf.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\zlib1.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.AssemblyReference.cache
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\Interop.Microsoft.Office.Interop.MSProject.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\Interop.Microsoft.Office.Interop.Excel.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\Interop.Microsoft.Office.Core.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\Interop.VBIDE.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.ResolveComReference.cache
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ExportSystemDialogView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ImportTestBlocksDialog.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\InteractiveManipulatorGraph.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\UserManagementView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Styles\Icons.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\MainWindow.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Analytics\AnalyticsView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ApplyTemplate\ApplyTemplateDialogView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\AssignDeveloper\AssignDeveloperDialog.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dashboard\DashboardView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\DeveloperPortal\DeveloperPortalView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ExportSystemDialogView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ImportTestBlocksDialog.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ReconstructProjectDialogView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\SelectSystemDialogView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\EVM\EVMView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\AnimatedGanttBar.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GanttView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GateProgressView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\QuickTasks\QuickTasksView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ResourceGantt\ResourceGanttView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\InteractiveManipulatorGraph.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\SimulationView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\SystemManagement\SystemManagementView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\CreateUserDialog.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\UserManagementView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\ProjectManagementControl.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Views\TacticalRibbonView.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\StartupWindow.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\App.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_Content.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\GeneratedInternalTypeHelper.g.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_MarkupCompile.cache
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_MarkupCompile.lref
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\App.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\MainWindow.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Analytics\AnalyticsView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ApplyTemplate\ApplyTemplateDialogView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\AssignDeveloper\AssignDeveloperDialog.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dashboard\DashboardView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\DeveloperPortal\DeveloperPortalView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ReconstructProjectDialogView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\SelectSystemDialogView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\EVM\EVMView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\AnimatedGanttBar.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GanttView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GateProgressView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\QuickTasks\QuickTasksView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ResourceGantt\ResourceGanttView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\SimulationView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\SystemManagement\SystemManagementView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\CreateUserDialog.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\ProjectManagementControl.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Themes\ProjectManagementResources.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Styles\CoreStyles.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Views\TacticalRibbonView.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\StartupWindow.baml
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.g.resources
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.GeneratedMSBuildEditorConfig.editorconfig
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.AssemblyInfoInputs.cache
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.AssemblyInfo.cs
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.CoreCompileInputs.cache
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.sourcelink.json
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResou.EAE02A4C.Up2Date
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\refint\WpfResourceGantt.dll
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.pdb
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.genruntimeconfig.cache
+D:\XC_VM_Shared\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ref\WpfResourceGantt.dll
+Z:\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.AssemblyReference.cache
+Z:\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.dll
+Z:\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\refint\WpfResourceGantt.dll
+Z:\IMATOOL\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.pdb
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Black.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-BlackItalic.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Bold.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-BoldItalic.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-ExtraBold.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-ExtraBoldItalic.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-ExtraLight.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-ExtraLightItalic.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Italic.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Light.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-LightItalic.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Medium.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-MediumItalic.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Regular.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-SemiBold.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-SemiBoldItalic.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Thin.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-ThinItalic.ttf
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\OFL.txt
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\WpfResourceGantt.exe
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\appsettings.json
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\WpfResourceGantt.deps.json
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\WpfResourceGantt.runtimeconfig.json
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\WpfResourceGantt.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\WpfResourceGantt.pdb
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Azure.Core.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Azure.Identity.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Humanizer.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LiveCharts.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LiveCharts.Wpf.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Bcl.AsyncInterfaces.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.CodeAnalysis.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.CodeAnalysis.CSharp.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.CodeAnalysis.CSharp.Workspaces.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.CodeAnalysis.Workspaces.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Data.SqlClient.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.EntityFrameworkCore.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.EntityFrameworkCore.Abstractions.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.EntityFrameworkCore.Design.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.EntityFrameworkCore.Relational.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.EntityFrameworkCore.SqlServer.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Caching.Abstractions.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Caching.Memory.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Configuration.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Configuration.Abstractions.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Configuration.FileExtensions.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Configuration.Json.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.DependencyInjection.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.DependencyModel.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.FileProviders.Abstractions.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.FileProviders.Physical.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.FileSystemGlobbing.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Logging.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Logging.Abstractions.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Options.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Extensions.Primitives.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Identity.Client.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Identity.Client.Extensions.Msal.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Abstractions.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.JsonWebTokens.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Logging.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Protocols.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.IdentityModel.Tokens.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.SqlServer.Server.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Microsoft.Xaml.Behaviors.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\Mono.TextTemplating.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\QuestPDF.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.ClientModel.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Composition.AttributedModel.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Composition.Convention.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Composition.Hosting.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Composition.Runtime.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Composition.TypedParts.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.IdentityModel.Tokens.Jwt.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.IO.Pipelines.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Memory.Data.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\System.Runtime.Caching.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\cs\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\de\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\es\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\fr\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\it\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ja\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ko\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pl\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pt-BR\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ru\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\tr\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hans\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hant\Microsoft.CodeAnalysis.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\cs\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\de\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\es\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\fr\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\it\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ja\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ko\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pl\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ru\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\tr\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\de\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\es\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\fr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\it\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ja\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ko\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pl\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pt-BR\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ru\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\tr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hans\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hant\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\cs\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\de\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\es\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\fr\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\it\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ja\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ko\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pl\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\pt-BR\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\ru\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\unix\lib\net6.0\Microsoft.Data.SqlClient.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win\lib\net6.0\Microsoft.Data.SqlClient.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-arm64\native\libQuestPdfSkia.so
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-arm64\native\libqpdf.so
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-musl-x64\native\libQuestPdfSkia.so
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-musl-x64\native\libqpdf.so
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-x64\native\libQuestPdfSkia.so
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\linux-x64\native\libqpdf.so
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\osx-arm64\native\libQuestPdfSkia.dylib
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\osx-arm64\native\libqpdf.dylib
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\osx-x64\native\libQuestPdfSkia.dylib
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\osx-x64\native\libqpdf.dylib
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\QuestPdfSkia.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\libgcc_s_seh-1.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\libstdc++-6.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\libwinpthread-1.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\qpdf.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x64\native\zlib1.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\QuestPdfSkia.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\libgcc_s_dw2-1.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\libstdc++-6.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\libwinpthread-1.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\qpdf.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\zlib1.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.AssemblyReference.cache
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\Interop.Microsoft.Office.Interop.MSProject.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\Interop.Microsoft.Office.Interop.Excel.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\Interop.Microsoft.Office.Core.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\Interop.VBIDE.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.ResolveComReference.cache
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ExportSystemDialogView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ImportTestBlocksDialog.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\InteractiveManipulatorGraph.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\UserManagementView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Styles\Icons.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\MainWindow.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Analytics\AnalyticsView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ApplyTemplate\ApplyTemplateDialogView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\AssignDeveloper\AssignDeveloperDialog.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dashboard\DashboardView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\DeveloperPortal\DeveloperPortalView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ExportSystemDialogView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ImportTestBlocksDialog.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ReconstructProjectDialogView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\SelectSystemDialogView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\EVM\EVMView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\AnimatedGanttBar.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GanttView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GateProgressView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\QuickTasks\QuickTasksView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ResourceGantt\ResourceGanttView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\InteractiveManipulatorGraph.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\SimulationView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\SystemManagement\SystemManagementView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\CreateUserDialog.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\UserManagementView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\ProjectManagementControl.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Views\TacticalRibbonView.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\StartupWindow.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\App.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_Content.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\GeneratedInternalTypeHelper.g.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_MarkupCompile.cache
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_MarkupCompile.lref
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\App.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\MainWindow.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Analytics\AnalyticsView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ApplyTemplate\ApplyTemplateDialogView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\AssignDeveloper\AssignDeveloperDialog.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dashboard\DashboardView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\DeveloperPortal\DeveloperPortalView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ReconstructProjectDialogView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\SelectSystemDialogView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\EVM\EVMView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\AnimatedGanttBar.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GanttView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GateProgressView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\QuickTasks\QuickTasksView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ResourceGantt\ResourceGanttView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\SimulationView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\SystemManagement\SystemManagementView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\CreateUserDialog.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\ProjectManagementControl.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Themes\ProjectManagementResources.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Styles\CoreStyles.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Views\TacticalRibbonView.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\StartupWindow.baml
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.g.resources
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.AssemblyInfoInputs.cache
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.AssemblyInfo.cs
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.CoreCompileInputs.cache
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.sourcelink.json
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResou.EAE02A4C.Up2Date
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\refint\WpfResourceGantt.dll
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.pdb
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.genruntimeconfig.cache
+E:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ref\WpfResourceGantt.dll
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.AssemblyReference.cache
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.dll
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\refint\WpfResourceGantt.dll
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.pdb
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.ResolveComReference.cache
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ExportSystemDialogView.baml
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ImportTestBlocksDialog.baml
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\InteractiveManipulatorGraph.baml
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\UserManagementView.baml
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Styles\Icons.baml
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\MainWindow.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Analytics\AnalyticsView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ApplyTemplate\ApplyTemplateDialogView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\AssignDeveloper\AssignDeveloperDialog.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dashboard\DashboardView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\DeveloperPortal\DeveloperPortalView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ExportSystemDialogView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ImportTestBlocksDialog.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ReconstructProjectDialogView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\SelectSystemDialogView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\EVM\EVMView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\AnimatedGanttBar.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GanttView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GateProgressView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\QuickTasks\QuickTasksView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ResourceGantt\ResourceGanttView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\InteractiveManipulatorGraph.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\SimulationView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\SystemManagement\SystemManagementView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\CreateUserDialog.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\UserManagementView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\ProjectManagementControl.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Views\TacticalRibbonView.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\StartupWindow.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\App.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_Content.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\GeneratedInternalTypeHelper.g.cs
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_MarkupCompile.cache
+D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_MarkupCompile.lref
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Black.ttf
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-BlackItalic.ttf
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\LatoFont\Lato-Bold.ttf
@@ -158,42 +671,6 @@ D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\qpdf.dll
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win-x86\native\zlib1.dll
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\bin\Debug\net8.0-windows\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.AssemblyReference.cache
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.ResolveComReference.cache
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ExportSystemDialogView.baml
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ImportTestBlocksDialog.baml
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\InteractiveManipulatorGraph.baml
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\UserManagementView.baml
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Styles\Icons.baml
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\MainWindow.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Analytics\AnalyticsView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ApplyTemplate\ApplyTemplateDialogView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\AssignDeveloper\AssignDeveloperDialog.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dashboard\DashboardView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\DeveloperPortal\DeveloperPortalView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ExportSystemDialogView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ImportTestBlocksDialog.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\ReconstructProjectDialogView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Dialogs\SelectSystemDialogView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\EVM\EVMView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\AnimatedGanttBar.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GanttView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Gantt\GateProgressView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\QuickTasks\QuickTasksView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\ResourceGantt\ResourceGanttView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\InteractiveManipulatorGraph.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Simulation\SimulationView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\SystemManagement\SystemManagementView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\CreateUserDialog.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\UserManagement\UserManagementView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\ProjectManagementControl.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\UI\Views\TacticalRibbonView.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\StartupWindow.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\App.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_Content.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\GeneratedInternalTypeHelper.g.cs
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_MarkupCompile.cache
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt_MarkupCompile.lref
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\App.baml
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\MainWindow.baml
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ProjectManagement\Features\Analytics\AnalyticsView.baml
@@ -224,8 +701,5 @@ D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.csproj.CoreCompileInputs.cache
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.sourcelink.json
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResou.EAE02A4C.Up2Date
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.dll
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\refint\WpfResourceGantt.dll
-D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.pdb
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\WpfResourceGantt.genruntimeconfig.cache
 D:\Project Management Application\Merged\ResourceAllocation\WpfResourceGantt\obj\Debug\net8.0-windows\ref\WpfResourceGantt.dll

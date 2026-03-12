@@ -75,6 +75,16 @@ namespace WpfResourceGantt.ProjectManagement.Data
 
 
 
+            // Optimistic concurrency: RowVersion columns prevent stale overwrites
+            modelBuilder.Entity<SystemItem>().Property(e => e.RowVersion).IsRowVersion();
+            modelBuilder.Entity<WorkBreakdownItem>().Property(e => e.RowVersion).IsRowVersion();
+            modelBuilder.Entity<User>().Property(e => e.RowVersion).IsRowVersion();
+            modelBuilder.Entity<ProgressBlock>().Property(e => e.RowVersion).IsRowVersion();
+            modelBuilder.Entity<ProgressItem>().Property(e => e.RowVersion).IsRowVersion();
+            modelBuilder.Entity<ProgressHistoryItem>().Property(e => e.RowVersion).IsRowVersion();
+            modelBuilder.Entity<ResourceAssignment>().Property(e => e.RowVersion).IsRowVersion();
+            modelBuilder.Entity<AdminTask>().Property(e => e.RowVersion).IsRowVersion();
+
             modelBuilder.Entity<User>()
                 .Property(u => u.HourlyRate)
                 .HasPrecision(18, 2);

@@ -29,6 +29,7 @@ namespace WpfResourceGantt.ProjectManagement
         private string PreferencesPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "user_preferences.json");
         private bool _isSaving = false;
         private bool _saveRequested = false;
+        private bool _hasUnsavedChanges = false;
         private CancellationTokenSource? _saveDebounceCts;
         private Task _activeSaveTask = Task.CompletedTask;
 
@@ -78,7 +79,17 @@ namespace WpfResourceGantt.ProjectManagement
             if (!string.IsNullOrEmpty(newSystemName))
             {
                 // Calculate WBS based on existing system count (1, 2, 3...)
-                int nextSequence = _projectData.Systems.Count;
+                int nextSequence = 0;
+                if (_projectData.Systems.Any())
+                {
+                    var numericValues = _projectData.Systems
+                        .Select(s => int.TryParse(s.WbsValue, out int val) ? val : 0);
+
+                    if (numericValues.Any())
+                    {
+                        nextSequence = numericValues.Max();
+                    }
+                }
                 string structuralWbs = (nextSequence + 1).ToString();
 
                 targetSystem = new SystemItem
@@ -87,7 +98,6 @@ namespace WpfResourceGantt.ProjectManagement
                     // APPLYING YOUR PATTERN: Number is a prefix for the Name property
                     Name = $"{newSystemNumber} {newSystemName}".Trim(),
                     WbsValue = structuralWbs,
-                    ProjectManagerId = defaultPmId,
                     Sequence = nextSequence
                 };
                 _projectData.Systems.Add(targetSystem);
@@ -110,6 +120,7 @@ namespace WpfResourceGantt.ProjectManagement
                 targetSystem.RecalculateRollup();
             }
 
+            MarkSystemDirty(targetSystem.Id);
             await SaveDataAsync();
         }
         public async Task LoadDataAsync(string filePath = "ProjectManagement/data.json")
@@ -308,6 +319,8 @@ namespace WpfResourceGantt.ProjectManagement
         }
         public async Task SaveDataAsync()
         {
+            _hasUnsavedChanges = true;
+
             // Cancel any pending save timer
             _saveDebounceCts?.Cancel();
             _saveDebounceCts = new CancellationTokenSource();
@@ -332,7 +345,8 @@ namespace WpfResourceGantt.ProjectManagement
             await _activeSaveTask;
         }
 
-        // 2. ADD THIS METHOD: Forces an immediate save (Used when the app is closing)
+        // Forces an immediate save (Used when the app is closing)
+        // Only saves if there are actual unsaved changes to prevent stale data overwrites.
         public async Task EnsureSavedAsync()
         {
             // Stop the 300ms timer
@@ -341,9 +355,76 @@ namespace WpfResourceGantt.ProjectManagement
             // Wait for any DB operation currently running
             await _activeSaveTask;
 
-            // Force one final immediate save to catch everything left in memory
-            await ExecuteDbSaveAsync();
+            // Only save if the user actually made changes in this session
+            if (_hasUnsavedChanges)
+            {
+                await ExecuteDbSaveAsync();
+            }
         }
+        /// <summary>
+        /// Marks all entities in the given system's subtree as dirty so they are
+        /// included in the next save. Call this from any ViewModel that modifies
+        /// data within a specific system before calling SaveDataAsync().
+        /// </summary>
+        public void MarkSystemDirty(string systemId)
+        {
+            var system = _projectData?.Systems?.FirstOrDefault(s => s.Id == systemId);
+            if (system == null) return;
+            system.IsDirty = true;
+            foreach (var child in system.Children)
+                MarkWorkBreakdownItemDirty(child);
+        }
+
+        /// <summary>
+        /// Marks a single user as dirty so their record is included in the next save.
+        /// Call from UserManagementViewModel when editing an existing user.
+        /// </summary>
+        public void MarkUserDirty(string userId)
+        {
+            var user = _projectData?.Users?.FirstOrDefault(u => u.Id == userId);
+            if (user != null) user.IsDirty = true;
+        }
+
+        // Single recursive helper — both mark and clear share the same traversal logic.
+        private void SetDirtyFlagsRecursive(WorkBreakdownItem item, bool dirty)
+        {
+            item.IsDirty = dirty;
+            foreach (var block in item.ProgressBlocks)
+            {
+                block.IsDirty = dirty;
+                foreach (var pi in block.Items) pi.IsDirty = dirty;
+            }
+            foreach (var hist in item.ProgressHistory)
+                hist.IsDirty = dirty;
+            foreach (var assignment in item.Assignments)
+                assignment.IsDirty = dirty;
+            foreach (var child in item.Children)
+                SetDirtyFlagsRecursive(child, dirty);
+        }
+
+        private void MarkWorkBreakdownItemDirty(WorkBreakdownItem item)
+            => SetDirtyFlagsRecursive(item, dirty: true);
+
+        private void ClearAllDirtyFlags()
+        {
+            if (_projectData == null) return;
+            foreach (var system in _projectData.Systems)
+            {
+                system.IsDirty = false;
+                foreach (var child in system.Children)
+                    SetDirtyFlagsRecursive(child, dirty: false);
+            }
+            foreach (var user in _projectData.Users)
+                user.IsDirty = false;
+        }
+
+        private void NotifySaveSuccess()
+        {
+            _hasUnsavedChanges = false;
+            ClearAllDirtyFlags();
+            DataChanged?.Invoke(this, EventArgs.Empty);
+        }
+
         public async Task ExecuteDbSaveAsync()
         {
             if (_isSaving) return;
@@ -514,7 +595,11 @@ namespace WpfResourceGantt.ProjectManagement
                         context.Users.RemoveRange(toRemove);
                     }
 
-                    // 4. SMART SAVE (The Graph)
+                    // 4. SMART SAVE (Delta-Only Graph)
+                    // Only entities with IsDirty = true are marked Modified.
+                    // Existing entities that were not touched by this user session are
+                    // Detached so EF Core generates no UPDATE and no RowVersion check for them.
+                    // This eliminates false concurrency conflicts between users on different projects.
                     var trackedIdsInThisSession = new HashSet<string>();
 
                     foreach (var system in _projectData.Systems)
@@ -522,12 +607,14 @@ namespace WpfResourceGantt.ProjectManagement
                         context.ChangeTracker.TrackGraph(system, node =>
                         {
                             string id = null;
-                            if (node.Entry.Entity is SystemItem s) id = s.Id;
-                            else if (node.Entry.Entity is WorkBreakdownItem w) id = w.Id;
-                            else if (node.Entry.Entity is ProgressBlock b) id = b.Id;
-                            else if (node.Entry.Entity is ProgressItem pi) id = pi.Id;
-                            else if (node.Entry.Entity is ProgressHistoryItem ph) id = ph.Id;
-                            else if (node.Entry.Entity is ResourceAssignment ra) id = ra.Id;
+                            bool isDirty = false;
+
+                            if (node.Entry.Entity is SystemItem s)        { id = s.Id; isDirty = s.IsDirty; }
+                            else if (node.Entry.Entity is WorkBreakdownItem w) { id = w.Id; isDirty = w.IsDirty; }
+                            else if (node.Entry.Entity is ProgressBlock b)     { id = b.Id; isDirty = b.IsDirty; }
+                            else if (node.Entry.Entity is ProgressItem pi)     { id = pi.Id; isDirty = pi.IsDirty; }
+                            else if (node.Entry.Entity is ProgressHistoryItem ph) { id = ph.Id; isDirty = ph.IsDirty; }
+                            else if (node.Entry.Entity is ResourceAssignment ra)  { id = ra.Id; isDirty = ra.IsDirty; }
 
                             if (id == null || trackedIdsInThisSession.Contains(id))
                             {
@@ -537,26 +624,79 @@ namespace WpfResourceGantt.ProjectManagement
 
                             bool existsInDb = dbSystemIds.Contains(id) || dbWorkItemIds.Contains(id) ||
                                              dbBlockIds.Contains(id) || dbChecklistIds.Contains(id) ||
-                                            dbHistoryIds.Contains(id) || dbAssignmentIds.Contains(id);
+                                             dbHistoryIds.Contains(id) || dbAssignmentIds.Contains(id);
 
-                            node.Entry.State = existsInDb ? EntityState.Modified : EntityState.Added;
+                            if (!existsInDb)
+                                node.Entry.State = EntityState.Added;
+                            else if (isDirty)
+                                node.Entry.State = EntityState.Modified;
+                            else
+                                node.Entry.State = EntityState.Detached; // Not changed — skip entirely
+
                             trackedIdsInThisSession.Add(id);
                         });
                     }
 
-                    // Handle Users separately
+                    // Handle Users separately (only save dirty or new users)
                     foreach (var user in _projectData.Users)
-                        context.Entry(user).State = dbUserIds.Contains(user.Id) ? EntityState.Modified : EntityState.Added;
+                    {
+                        bool userExistsInDb = dbUserIds.Contains(user.Id);
+                        if (!userExistsInDb)
+                            context.Entry(user).State = EntityState.Added;
+                        else if (user.IsDirty)
+                            context.Entry(user).State = EntityState.Modified;
+                        // else: skip — not modified in this session
+                    }
 
                     // Handle Admin Tasks separately (since they are roots in the DB)
                     var dbAdminTaskIds = await context.AdminTasks.Select(a => a.Id).ToListAsync();
                     // Assuming _projectData has AdminTasks list (if you added it)
                     // If not, this part is skipped, but AdminTasks won't be deleted implicitly.
 
-                    await context.SaveChangesAsync();
+                    // 5. SAVE with silent-merge retry for concurrent conflicts
+                    try
+                    {
+                        await context.SaveChangesAsync();
+                        NotifySaveSuccess();
+                    }
+                    catch (DbUpdateConcurrencyException ex)
+                    {
+                        // Phase 3: Silent Merge — reload the fresh RowVersions for conflicting
+                        // entries and retry. This handles the rare case where two users
+                        // edit the SAME row at nearly the same instant.
+                        foreach (var entry in ex.Entries)
+                        {
+                            var dbValues = await entry.GetDatabaseValuesAsync();
+                            if (dbValues != null)
+                            {
+                                // Refresh the RowVersion token so the retry UPDATE matches the DB
+                                entry.OriginalValues.SetValues(dbValues);
+                            }
+                            else
+                            {
+                                // The row was deleted by another user — detach it to allow partial save
+                                entry.State = EntityState.Detached;
+                            }
+                        }
 
-                    // Notify UI
-                    DataChanged?.Invoke(this, EventArgs.Empty);
+                        try
+                        {
+                            await context.SaveChangesAsync();
+                            NotifySaveSuccess();
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            // True simultaneous conflict: two users edited the exact same row
+                            // at the exact same instant even after retry.
+                            // Leave _hasUnsavedChanges = true so EnsureSavedAsync retries on close.
+                            MessageBox.Show(
+                                "Your changes could not be saved because another user is editing the same record simultaneously.\n\n" +
+                                "Please close and reopen the application to load the latest data, then re-apply your edits.",
+                                "Concurrent Edit Conflict",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -632,13 +772,25 @@ namespace WpfResourceGantt.ProjectManagement
                         var system = systems.FirstOrDefault(s => s.Id == systemId);
 
                         // D. Derive Project Office Symbol
+                        // Find the PM who manages this project (Level 1) by looking at User.ManagedProjectIds
                         string projectSymbol = "N/A";
-                        if (system != null && !string.IsNullOrEmpty(system.ProjectManagerId))
+                        // Derive the Level 1 project ID from the work item's ID (e.g., "SYS-123|0|2" -> "SYS-123|0")
+                        string projectIdForSymbol = wi.Id;
+                        var idParts = wi.Id.Split('|');
+                        if (idParts.Length >= 2)
+                            projectIdForSymbol = $"{idParts[0]}|{idParts[1]}";
+
+                        var managingPm = users.FirstOrDefault(u =>
+                            u.Role == Role.ProjectManager &&
+                            u.ManagedProjectIds != null &&
+                            u.ManagedProjectIds.Contains(projectIdForSymbol));
+
+                        if (managingPm != null)
                         {
                             var managingChief = users.FirstOrDefault(u =>
                                 u.Role == Role.SectionChief &&
                                 u.ManagedProjectManagerIds != null &&
-                                u.ManagedProjectManagerIds.Contains(system.ProjectManagerId));
+                                u.ManagedProjectManagerIds.Contains(managingPm.Id));
 
                             if (managingChief != null)
                                 projectSymbol = managingChief.Section;
@@ -771,10 +923,15 @@ namespace WpfResourceGantt.ProjectManagement
             var systemToRemove = _projectData.Systems.FirstOrDefault(s => s.Id == systemId);
             if (systemToRemove != null)
             {
-                // 1. Remove from local memory list
+                // 1. CASCADE CLEANUP: Remove all project IDs under this system from PM ManagedProjectIds
+                var projectIds = new List<string>();
+                CollectAllItemIdsRecursive(systemToRemove.Children, projectIds);
+                CleanupManagedProjectIds(projectIds);
+
+                // 2. Remove from local memory list
                 _projectData.Systems.Remove(systemToRemove);
 
-                // 2. The existing SaveDataAsync will detect the ID is missing from _projectData.Systems
+                // 3. The existing SaveDataAsync will detect the ID is missing from _projectData.Systems
                 // and execute context.Systems.RemoveRange(...) based on your 'systemsToDelete' logic.
                 await SaveDataAsync();
             }
@@ -865,11 +1022,16 @@ namespace WpfResourceGantt.ProjectManagement
 
                 // 2. Set Level
                 item.Level = level;
-
+                // ONLY generate a new ID if it's empty or doesn't follow the parent path
+                // This prevents existing items from "losing" their ID (and expansion state)
+                if (string.IsNullOrEmpty(item.Id) || !item.Id.StartsWith(parentIdPrefix))
+                {
+                    item.Id = $"{parentIdPrefix}|{Guid.NewGuid().ToString("N").Substring(0, 8)}";
+                }
                 // 3. GENERATE ID BASED ON SEQUENCE
                 // This creates a solid chain like: "SYS-A|0|2" (System A -> 1st Child -> 3rd Grandchild)
                 // This is 100% unique and reproducible on reload.
-                item.Id = $"{parentIdPrefix}|{item.Sequence}";
+                //item.Id = $"{parentIdPrefix}|{item.Sequence}";
 
                 // 4. Initialize History if needed
                 if (item.Children == null || !item.Children.Any())
@@ -986,6 +1148,166 @@ namespace WpfResourceGantt.ProjectManagement
             catch { return null; }
         }
 
+        public async Task ReplicateSubProjectStructureAsync(string sourceSubProjectId)
+        {
+            var sourceSubProject = GetWorkBreakdownItemById(sourceSubProjectId);
+            if (sourceSubProject == null || sourceSubProject.Level != 2) return;
+
+            string sourcePrefix = sourceSubProject.Name.Split(' ').FirstOrDefault() ?? "";
+            string systemId = sourceSubProjectId.Split('|')[0];
+            var system = GetSystemById(systemId);
+
+            var allSubProjectsInSystem = new List<WorkBreakdownItem>();
+            CollectByLevel(system.Children, level: 2, allSubProjectsInSystem);
+            var targetSubProjects = allSubProjectsInSystem.Where(c => c.Id != sourceSubProjectId).ToList();
+
+            int subProjectCount = 0;
+            int itemsInjectedCount = 0;
+
+            foreach (var targetSub in targetSubProjects)
+            {
+                string targetPrefix = targetSub.Name.Split(' ').FirstOrDefault() ?? "";
+                bool modified = false;
+
+                // 1. Match Gates (Level 3)
+                foreach (var sourceGate in sourceSubProject.Children)
+                {
+                    string sourceGateCore = GetCoreName(sourceGate.Name);
+                    var targetGate = targetSub.Children.FirstOrDefault(tg => GetCoreName(tg.Name) == sourceGateCore);
+
+                    if (targetGate != null)
+                    {
+                        // 2. Match Tasks (Level 4) inside the Gate
+                        foreach (var sourceTask in sourceGate.Children)
+                        {
+                            string sourceTaskCore = GetCoreName(sourceTask.Name);
+                            var targetTask = targetGate.Children.FirstOrDefault(tt => GetCoreName(tt.Name) == sourceTaskCore);
+
+                            if (targetTask != null)
+                            {
+                                // --- INJECTION LOGIC ---
+                                // We do NOT change targetTask.StartDate or targetTask.EndDate.
+
+                                // A. Inject Progress Blocks (Checklists)
+                                targetTask.ProgressBlocks = CloneBlocks(sourceTask.ProgressBlocks);
+
+                                // B. Inject Level 5 Sub-tasks (if they exist in source)
+                                if (sourceTask.Children != null && sourceTask.Children.Any())
+                                {
+                                    targetTask.Children.Clear();
+                                    foreach (var sourceSubTask in sourceTask.Children)
+                                    {
+                                        var clonedSubTask = DeepCloneForReplication(sourceSubTask, sourcePrefix, targetPrefix);
+
+                                        // MANDATORY: To keep Level 4 dates from shifting, the new Level 5 
+                                        // sub-tasks must inherit the target parent's current dates.
+                                        clonedSubTask.StartDate = targetTask.StartDate;
+                                        clonedSubTask.EndDate = targetTask.EndDate;
+
+                                        targetTask.Children.Add(clonedSubTask);
+                                        itemsInjectedCount++;
+                                    }
+                                }
+                                modified = true;
+                            }
+                        }
+                    }
+                }
+
+                if (modified)
+                {
+                    // Fix IDs for the new nested items
+                    SanitizeChildrenIds(targetSub.Children, targetSub.Id, 3);
+                    subProjectCount++;
+                }
+            }
+
+            MarkSystemDirty(systemId);
+            await SaveDataAsync();
+            MessageBox.Show($"Injection Success!\n\nSynced {subProjectCount} SubProjects.\nInjected {itemsInjectedCount} sub-tasks and their checklists.\n\nNote: Original dates for existing Gates and Tasks were preserved.");
+        }
+
+        private List<ProgressBlock> CloneBlocks(List<ProgressBlock> sourceBlocks)
+        {
+            if (sourceBlocks == null) return new List<ProgressBlock>();
+            return sourceBlocks.Select(pb => new ProgressBlock
+            {
+                Id = "PB-" + Guid.NewGuid().ToString("N").Substring(0, 12),
+                Name = pb.Name,
+                Sequence = pb.Sequence,
+                Items = pb.Items?.Select(pi => new ProgressItem
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = pi.Name,
+                    Sequence = pi.Sequence,
+                    IsCompleted = false
+                }).ToList() ?? new List<ProgressItem>()
+            }).ToList();
+        }
+
+        // Helper to strip prefixes like "339-025-1825"
+        private string GetCoreName(string fullName)
+        {
+            if (string.IsNullOrWhiteSpace(fullName)) return "";
+            int firstSpace = fullName.IndexOf(' ');
+            if (firstSpace == -1) return fullName.Trim();
+            return fullName.Substring(firstSpace).Trim();
+        }
+
+        private WorkBreakdownItem DeepCloneForReplication(WorkBreakdownItem source, string oldPrefix, string newPrefix)
+        {
+            var clone = new WorkBreakdownItem
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = source.Name?.Replace(oldPrefix, newPrefix),
+                ItemType = source.ItemType,
+                DurationDays = source.DurationDays,
+                Work = source.Work,
+                ScheduleMode = source.ScheduleMode,
+                Status = WorkItemStatus.Active,
+                Level = source.Level,
+
+                // Reset assignment/execution data as requested
+                AssignedDeveloperId = null,
+                Assignments = new List<ResourceAssignment>(),
+                Predecessors = null,
+                Progress = 0,
+                ActualWork = 0,
+                Bcws = 0,
+                Bcwp = 0,
+                Acwp = 0,
+
+                // Deep Clone Checklist Blocks
+                ProgressBlocks = source.ProgressBlocks?.Select(pb => new ProgressBlock
+                {
+                    Id = "PB-" + Guid.NewGuid().ToString("N").Substring(0, 12),
+                    Name = pb.Name,
+                    Sequence = pb.Sequence,
+                    Items = pb.Items?.Select(pi => new ProgressItem
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = pi.Name,
+                        Sequence = pi.Sequence,
+                        IsCompleted = false
+                    }).ToList() ?? new List<ProgressItem>()
+                }).ToList() ?? new List<ProgressBlock>(),
+
+                Children = new List<WorkBreakdownItem>()
+            };
+
+            // Recursively clone Level 4 tasks AND their Level 5 sub-tasks
+            if (source.Children != null)
+            {
+                foreach (var child in source.Children)
+                {
+                    clone.Children.Add(DeepCloneForReplication(child, oldPrefix, newPrefix));
+                }
+            }
+
+            return clone;
+        }
+
+
         #region System & User Management (Largely Unchanged)
 
         public List<SystemItem> GetSystemsForUser(User loggedInUser)
@@ -994,25 +1316,58 @@ namespace WpfResourceGantt.ProjectManagement
 
             switch (loggedInUser.Role)
             {
+                // Leadership and Administrator roles see ALL systems and ALL projects
+                case Role.Administrator:
                 case Role.FlightChief:
-                    return _projectData.Systems;
-
+                case Role.SectionChief:
                 case Role.TechnicalSpecialist:
                     return _projectData.Systems;
 
-                case Role.SectionChief:
-                    var managedPmIds = loggedInUser.ManagedProjectManagerIds ?? new List<string>();
-                    return _projectData.Systems.Where(s => managedPmIds.Contains(s.ProjectManagerId)).ToList();
-
+                // Project Managers see ALL systems, but only their managed projects
                 case Role.ProjectManager:
-                    return _projectData.Systems.Where(s => s.ProjectManagerId == loggedInUser.Id).ToList();
+                    return FilterProjectsForPM(loggedInUser);
 
+                // Developers see only systems/branches containing their assigned tasks
                 case Role.Developer:
                     return FilterSystemsForDeveloper(loggedInUser.Id);
 
                 default:
                     return new List<SystemItem>();
             }
+        }
+
+        /// <summary>
+        /// Returns ALL systems but filters Level 1 children to only those the PM manages.
+        /// A PM "manages" a project if:
+        ///   1. The project ID is in their ManagedProjectIds list, OR
+        ///   2. The PM has a ResourceAssignment on the project (Level 1 item)
+        /// Systems that have no managed projects for this PM will still appear (as empty containers).
+        /// </summary>
+        private List<SystemItem> FilterProjectsForPM(User pmUser)
+        {
+            var managedIds = pmUser.ManagedProjectIds ?? new List<string>();
+            var result = new List<SystemItem>();
+
+            foreach (var system in _projectData.Systems)
+            {
+                // Filter Level 1 children (Projects) to only those the PM manages
+                // Check BOTH the explicit ManagedProjectIds list AND ResourceAssignments
+                var filteredChildren = system.Children
+                    .Where(c => managedIds.Contains(c.Id) ||
+                                (c.Assignments != null && c.Assignments.Any(a => a.DeveloperId == pmUser.Id)))
+                    .ToList();
+
+                // Always show the system container, even if empty for this PM
+                result.Add(new SystemItem
+                {
+                    Id = system.Id,
+                    Name = system.Name,
+                    WbsValue = system.WbsValue,
+                    Status = system.Status,
+                    Children = filteredChildren
+                });
+            }
+            return result;
         }
 
         public SystemItem GetSystemById(string systemId)
@@ -1223,6 +1578,7 @@ namespace WpfResourceGantt.ProjectManagement
             BaselineItemsRecursive(system.Children);
             system.RecalculateRollup();
 
+            MarkSystemDirty(systemId);
             await SaveDataAsync();
         }
 
@@ -1306,15 +1662,20 @@ namespace WpfResourceGantt.ProjectManagement
                 Name = original.Name + " (Copy)",
                 StartDate = original.StartDate,
                 EndDate = original.EndDate,
+                DurationDays = original.DurationDays,
+                Predecessors = original.Predecessors,
+                StartNoEarlierThan = original.StartNoEarlierThan,
+                ScheduleMode = original.ScheduleMode,
                 Work = original.Work,
                 BAC = original.BAC,
                 Status = WorkItemStatus.Active,
                 Level = original.Level,
+                ItemType = original.ItemType, // Preserve milestone / receipt / leaf type
 
                 // Explicitly reset all progress/execution metrics for the new copy
                 Progress = 0,
                 ActualWork = 0,
-                ActualFinishDate = null,
+                ActualFinishDate = null, // Milestones clone in uncompleted state
                 Bcws = 0,
                 Bcwp = 0,
                 Acwp = 0,
@@ -1371,7 +1732,6 @@ namespace WpfResourceGantt.ProjectManagement
                 Id = $"SYS-{Guid.NewGuid().ToString().Substring(0, 8)}",
                 WbsValue = original.WbsValue,
                 Name = original.Name + " (Copy)",
-                ProjectManagerId = original.ProjectManagerId,
                 Status = WorkItemStatus.Active
             };
 
@@ -1488,7 +1848,6 @@ namespace WpfResourceGantt.ProjectManagement
                         // --- EXPLICITLY COPY ALL SYSTEM PROPERTIES ---
                         Id = system.Id,
                         Name = system.Name,
-                        ProjectManagerId = system.ProjectManagerId,
                         Status = system.Status,
 
                         // And use the filtered list of children.
@@ -1563,6 +1922,52 @@ namespace WpfResourceGantt.ProjectManagement
                     item.Assignments.RemoveAll(a => a.DeveloperId == userId);
                 }
                 RemoveUserAssignmentsRecursive(item.Children, userId);
+            }
+        }
+
+        /// <summary>
+        /// Removes the specified item IDs from all PM users' ManagedProjectIds lists.
+        /// Call this when a project or its children are deleted.
+        /// </summary>
+        public void CleanupManagedProjectIds(List<string> deletedItemIds)
+        {
+            if (_projectData?.Users == null || deletedItemIds == null || !deletedItemIds.Any()) return;
+
+            foreach (var user in _projectData.Users.Where(u => u.Role == Role.ProjectManager))
+            {
+                if (user.ManagedProjectIds != null)
+                {
+                    user.ManagedProjectIds.RemoveAll(id => deletedItemIds.Contains(id));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Recursively collects all WorkBreakdownItem IDs under the given collection.
+        /// Used for cascade cleanup when deleting branches.
+        /// </summary>
+        public void CollectAllItemIdsRecursive(List<WorkBreakdownItem> items, List<string> ids)
+        {
+            if (items == null) return;
+            foreach (var item in items)
+            {
+                ids.Add(item.Id);
+                CollectAllItemIdsRecursive(item.Children, ids);
+            }
+        }
+
+        /// <summary>
+        /// Recursively cleans up all resource assignments for items being deleted.
+        /// Removes assignments from the data model and clears AssignedDeveloperId.
+        /// </summary>
+        public void CleanupAssignmentsOnDelete(List<WorkBreakdownItem> items)
+        {
+            if (items == null) return;
+            foreach (var item in items)
+            {
+                item.Assignments?.Clear();
+                item.AssignedDeveloperId = null;
+                CleanupAssignmentsOnDelete(item.Children);
             }
         }
 

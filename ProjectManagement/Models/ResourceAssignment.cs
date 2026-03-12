@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -15,6 +17,13 @@ namespace WpfResourceGantt.ProjectManagement.Models
 
     public class ResourceAssignment
     {
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+        [NotMapped]
+        [JsonIgnore]
+        public bool IsDirty { get; set; }
+
         [JsonPropertyName("id")]
         public string Id { get; set; }
 

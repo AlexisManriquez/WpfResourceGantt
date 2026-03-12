@@ -77,6 +77,9 @@ The application supports a global toggle between **Dollars** and **Hours** modes
 ### Time Range Support
 Supports filtering: 30d, 60d, 90d, 180d, 1yr, 3yr, All
 
+## Simulation Impact Tracking
+In the **Temporal Sandbox**, EVM metrics are used to measure the "Cost of Reality." The **Impact Bar** compares Live metrics (from the database) against Simulated metrics in real-time. This allows PMs to see how a schedule slip or progress gain affects SV, CPI, and EAC before committing to a recovery plan.
+
 ## Refresh After Close Week
 When `MainViewModel.ExecuteCloseWeekAsync()` completes, it calls `EVMViewModel.Refresh()` if the EVM view is active, which re-calls `LoadDataForContext()` to reload the chart with the newly captured snapshot.
 

@@ -39,6 +39,16 @@ namespace WpfResourceGantt.ProjectManagement.Services
             {
                 if (manualItemIds.Contains(item.Id)) continue; // Skip overriding manual dates
 
+                // MILESTONE ENFORCEMENT: Milestones are zero-duration, point-in-time items.
+                if (item.IsMilestone)
+                {
+                    item.DurationDays = 0;
+                    if (!item.StartDate.HasValue)
+                        item.StartDate = item.StartNoEarlierThan ?? today;
+                    item.EndDate = item.StartDate; // Point-in-time: Start == End
+                    continue;
+                }
+
                 var predecessors = PredecessorParser.Parse(item.Predecessors);
                 if (!predecessors.Any())
                 {

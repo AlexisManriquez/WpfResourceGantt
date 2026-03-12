@@ -25,17 +25,19 @@ Held in memory by [[DataService]] as `_projectData`. All modifications happen to
 ## SystemItem (Level 0)
 **File**: `ProjectManagement/Models/ProjectData.cs` (line ~132)
 
-A **structural container** — no execution metrics, no dates, no EVM.
+A **pure structural container** — no execution metrics, no dates, no EVM, **no owner/PM assignment**.
 
 | Property | Type | Notes |
 |----------|------|-------|
 | `Id` | `string` | Format: `"SYS-{guid8}"` |
 | `WbsValue` | `string` | Display WBS code |
 | `Name` | `string` | System name |
-| `ProjectManagerId` | `string` | FK to `User.Id` |
 | `Status` | `WorkItemStatus` | Active/Complete/etc. |
 | `Sequence` | `int` | Sort order |
 | `Children` | `List<WorkBreakdownItem>` | Level 1 Projects |
+
+> [!IMPORTANT]
+> `ProjectManagerId` was **removed** from `SystemItem`. Systems are containers only. PM-to-project assignment is now tracked on the [[User & Role|User]] model via `ManagedProjectIds` and `ResourceAssignment` on Level 1 items.
 
 ### RecalculateRollup()
 Simply delegates to children — `SystemItem` itself stores **no** aggregated metrics:

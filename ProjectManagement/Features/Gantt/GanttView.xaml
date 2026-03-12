@@ -907,6 +907,7 @@ Margin="5,0,0,0">
                                         StartDate="{Binding StartDate}"
                                         EndDate="{Binding EndDate}"
                                         IsSummary="{Binding IsSummary}"
+                                        IsMilestone="{Binding IsMilestone}"
                                         IsCritical="{Binding IsCritical}"
                                         ScheduleHealth="{Binding ScheduleHealth}"
                                         IsBaselined="{Binding IsBaselined}"

@@ -73,6 +73,18 @@ namespace WpfResourceGantt.ProjectManagement.Services
 
         private void RecalculateLeaf(WorkBreakdownItem item, DateTime? statusDate = null)
         {
+            // MILESTONE EXCLUSION: Milestones generate zero Planned Value (PV),
+            // zero Earned Value (EV), and do not weigh into CPI or SPI indices.
+            if (item.IsMilestone)
+            {
+                item.BAC = 0;
+                item.Bcws = 0;
+                item.Bcwp = 0;
+                item.Acwp = 0;
+                item.Work = 0;
+                return;
+            }
+
             DateTime today = statusDate ?? DateTime.Today;
 
             // ── BAC ──────────────────────────────────────────────────────────
@@ -144,13 +156,14 @@ namespace WpfResourceGantt.ProjectManagement.Services
                 RecalculateSubTree(child, statusDate);
             }
 
-            // ── Roll up scalar metrics ────────────────────────────────────────
-            item.Work = Math.Round(item.Children.Sum(c => c.Work ?? 0), 2);
-            item.ActualWork = Math.Round(item.Children.Sum(c => c.ActualWork ?? 0), 2);
-            item.BAC = Math.Round(item.Children.Sum(c => c.BAC ?? 0), 2);
-            item.Bcws = Math.Round(item.Children.Sum(c => c.Bcws ?? 0), 2);
-            item.Bcwp = Math.Round(item.Children.Sum(c => c.Bcwp ?? 0), 2);
-            item.Acwp = Math.Round(item.Children.Sum(c => c.Acwp ?? 0), 2);
+            // ── Roll up scalar metrics (exclude milestones) ────────────────
+            var rollupChildren = item.Children.Where(c => !c.IsMilestone).ToList();
+            item.Work = Math.Round(rollupChildren.Sum(c => c.Work ?? 0), 2);
+            item.ActualWork = Math.Round(rollupChildren.Sum(c => c.ActualWork ?? 0), 2);
+            item.BAC = Math.Round(rollupChildren.Sum(c => c.BAC ?? 0), 2);
+            item.Bcws = Math.Round(rollupChildren.Sum(c => c.Bcws ?? 0), 2);
+            item.Bcwp = Math.Round(rollupChildren.Sum(c => c.Bcwp ?? 0), 2);
+            item.Acwp = Math.Round(rollupChildren.Sum(c => c.Acwp ?? 0), 2);
 
             // ── Progress (BAC-weighted) ───────────────────────────────────────
             decimal totalBac = item.BAC ?? 0;
@@ -160,19 +173,19 @@ namespace WpfResourceGantt.ProjectManagement.Services
             }
             else
             {
-                // Fallback for un-baselined items: simple average
-                item.Progress = item.Children.Any()
-                    ? item.Children.Average(c => c.Progress)
+                // Fallback for un-baselined items: simple average (exclude milestones)
+                item.Progress = rollupChildren.Any()
+                    ? rollupChildren.Average(c => c.Progress)
                     : 0;
             }
 
-            // ── Dates: expand to cover children, never shrink ────────────────
-            var childrenWithStart = item.Children
+            // ── Dates: expand to cover non-milestone children, never shrink ─
+            var childrenWithStart = rollupChildren
                 .Where(c => c.StartDate.HasValue)
                 .Select(c => c.StartDate!.Value)
                 .ToList();
 
-            var childrenWithEnd = item.Children
+            var childrenWithEnd = rollupChildren
                 .Where(c => c.EndDate.HasValue)
                 .Select(c => c.EndDate!.Value)
                 .ToList();

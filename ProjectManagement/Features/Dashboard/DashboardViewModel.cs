@@ -1,6 +1,3 @@
-using WpfResourceGantt.ProjectManagement.Models;
-using WpfResourceGantt.ProjectManagement.ViewModels; // For ViewModelBase
-using WpfResourceGantt.ProjectManagement; // For ViewModelBase class in Root namespace
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,6 +5,9 @@ using System.Threading.Tasks;
 using System.Windows; // For Point
 using System.Windows.Input;
 using System.Windows.Media; // For PointCollection
+using WpfResourceGantt.ProjectManagement; // For ViewModelBase class in Root namespace
+using WpfResourceGantt.ProjectManagement.Models;
+using WpfResourceGantt.ProjectManagement.ViewModels; // For ViewModelBase
 
 namespace WpfResourceGantt.ProjectManagement.Features.Dashboard
 {
@@ -29,7 +29,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Dashboard
     {
         private readonly DataService _dataService;
         private readonly User _currentUser;
-
+        private readonly MainViewModel _mainViewModel;
         private object _currentContextItem; // Can be SystemItem or WorkBreakdownItem
 
         public bool CanGoBack => _currentContextItem != null;
@@ -66,11 +66,12 @@ namespace WpfResourceGantt.ProjectManagement.Features.Dashboard
 
         public ICommand NavigateCommand { get; }
         public ICommand GoBackCommand { get; }
-
-        public DashboardViewModel(DataService dataService, User currentUser)
+        public ICommand OpenGateProgressCommand { get; }
+        public DashboardViewModel(DataService dataService, User currentUser, MainViewModel mainViewModel)
         {
             _dataService = dataService;
             _currentUser = currentUser;
+            _mainViewModel = mainViewModel;
 
             // Initialize Filters
             Sections = new ObservableCollection<string> { "All Sections", "Section A", "Section B", "Section C" };
@@ -81,7 +82,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Dashboard
 
             NavigateCommand = new RelayCommand<string>(Navigate); // Pass ID of item clicked
             GoBackCommand = new RelayCommand(GoBack);
-
+            OpenGateProgressCommand = new RelayCommand<string>(OpenGateProgress);
             LoadView();
         }
 
@@ -172,7 +173,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Dashboard
 
                         foreach (var task in userTasks)
                         {
-                            _allProjectCards.Add(CreateProjectCard(task.Name, task.Id, task.WbsValue, task.StartDate ?? DateTime.Now, task.EndDate ?? DateTime.Now, new List<WorkBreakdownItem> { task }));
+                            _allProjectCards.Add(CreateProjectCard(task.Name, task.Id, task.WbsValue, task.StartDate ?? DateTime.Now, task.EndDate ?? DateTime.Now, new List<WorkBreakdownItem> { task }, task.Level));
                         }
                     }
                 }
@@ -191,7 +192,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Dashboard
                             var realStart = allLeaves.Any() ? allLeaves.Min(l => l.StartDate ?? project.StartDate ?? DateTime.Now) : project.StartDate ?? DateTime.Now;
                             var realEnd = allLeaves.Any() ? allLeaves.Max(l => l.EndDate ?? project.EndDate ?? DateTime.Now) : project.EndDate ?? DateTime.Now;
 
-                            _allProjectCards.Add(CreateProjectCard($"{system.Name} > {project.Name}", project.Id, project.WbsValue, realStart, realEnd, allLeaves));
+                            _allProjectCards.Add(CreateProjectCard($"{system.Name} > {project.Name}", project.Id, project.WbsValue, realStart, realEnd, allLeaves, project.Level));
                         }
                     }
                 }
@@ -215,7 +216,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Dashboard
                         var realStart = allLeaves.Any() ? allLeaves.Min(l => l.StartDate ?? child.StartDate ?? DateTime.Now) : child.StartDate ?? DateTime.Now;
                         var realEnd = allLeaves.Any() ? allLeaves.Max(l => l.EndDate ?? child.EndDate ?? DateTime.Now) : child.EndDate ?? DateTime.Now;
 
-                        _allProjectCards.Add(CreateProjectCard(child.Name, child.Id, child.WbsValue, realStart, realEnd, allLeaves));
+                        _allProjectCards.Add(CreateProjectCard(child.Name, child.Id, child.WbsValue, realStart, realEnd, allLeaves, child.Level));
                     }
                 }
             }
@@ -299,7 +300,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Dashboard
             return null;
         }
 
-        private ProjectCardViewModel CreateProjectCard(string name, string internalId, string wbsValue, DateTime start, DateTime end, List<WorkBreakdownItem> leafNodes)
+        private ProjectCardViewModel CreateProjectCard(string name, string internalId, string wbsValue, DateTime start, DateTime end, List<WorkBreakdownItem> leafNodes, int level)
         {
             var expectedPoints = new PointCollection();
             var actualPoints = new PointCollection();
@@ -536,7 +537,8 @@ namespace WpfResourceGantt.ProjectManagement.Features.Dashboard
                 EndDate = chartEnd,
                 BehindAheadText = behindAheadText,
                 IsBehind = isBehind,
-                XAxisLabels = axisLabels
+                XAxisLabels = axisLabels,
+                IsSubProject = level == 2
             };
         }
 
@@ -633,7 +635,61 @@ namespace WpfResourceGantt.ProjectManagement.Features.Dashboard
                 XOffset = x
             };
         }
+        private void OpenGateProgress(string itemId)
+        {
+            // 1. Search the Gantt View's memory for the ALREADY LOADED object.
+            // Flatten() turns the tree into a list so FirstOrDefault works perfectly.
+            var liveWorkItem = _mainViewModel.GanttViewModel?.WorkItems
+                .Flatten()
+                .FirstOrDefault(w => w.Id == itemId);
 
+            if (liveWorkItem != null)
+            {
+                // Go to the gate view using the object already tracked by the DB context
+                _mainViewModel.GoToGateProgress(liveWorkItem);
+                return;
+            }
+
+            // 2. Fallback: If not found in Gantt (Gantt view hasn't been opened yet), 
+            // fetch from DB and map it.
+            var workItemModel = _dataService.GetWorkBreakdownItemById(itemId);
+            if (workItemModel != null && workItemModel.Level == 2)
+            {
+                var uiWorkItem = MapToWorkItem(workItemModel);
+                _mainViewModel.GoToGateProgress(uiWorkItem);
+            }
+        }
+        private WorkItem MapToWorkItem(WorkBreakdownItem item)
+        {
+            if (item == null) return null;
+
+            return new WorkItem
+            {
+                Id = item.Id,
+                Name = item.Name,
+                WbsValue = item.WbsValue,
+                Level = item.Level,
+                StartDate = item.StartDate ?? DateTime.Today,
+                EndDate = item.EndDate ?? DateTime.Today,
+                Work = item.Work ?? 0,
+                ActualWork = item.ActualWork ?? 0,
+                Progress = item.Progress,
+                Status = item.Status,
+                ItemType = item.ItemType,
+
+                // CRITICAL: Map the children (Gates) and Progress Blocks (Checklists)
+                Children = new ObservableCollection<WorkItem>(item.Children?.Select(MapToWorkItem) ?? Enumerable.Empty<WorkItem>()),
+                ProgressBlocks = new ObservableCollection<ProgressBlock>(item.ProgressBlocks ?? new List<ProgressBlock>()),
+
+                DeveloperName = item.Assignments?.Any() == true
+                    ? string.Join(", ", item.Assignments.Select(a => a.DeveloperId))
+                    : "Unassigned"
+            };
+        }
+        public void Refresh()
+        {
+            LoadView(); // Reloads the cards using the current _currentContextItem
+        }
     }
 
     public class ProjectCardViewModel
@@ -655,6 +711,7 @@ namespace WpfResourceGantt.ProjectManagement.Features.Dashboard
 
         public string StatusTextColor => IsBehind ? "#DC2626" : "#059669"; // Red if behind, Green if ahead/track
         public ObservableCollection<GraphAxisLabel> XAxisLabels { get; set; }
+        public bool IsSubProject { get; set; }
     }
     public class ProjectRowViewModel
     {

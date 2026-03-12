@@ -148,6 +148,11 @@
 
 
                                 <Button Style="{StaticResource TacticalRibbonSmallButtonStyle}" Content="Delete Item" Tag="{StaticResource Icon_Delete}" Command="{Binding SystemManagementContext.DeleteCommand}"/>
+                                <!--<Button Style="{StaticResource TacticalRibbonButtonStyle}" 
+        Content="REPLICATE&#x0a;STRUCTURE" 
+        ToolTip="Copy this subproject's task structure to all others in the system."
+        Tag="{StaticResource Icon_Import}" 
+        Command="{Binding SystemManagementContext.ReplicateStructureCommand}"/>-->
                             </StackPanel>
                         </StackPanel>
                         <TextBlock Grid.Row="1" Text="EDITING" Style="{StaticResource TacticalCategoryLabelStyle}"/>
@@ -212,6 +217,11 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <StackPanel Orientation="Horizontal" Grid.Row="0">
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" Content="EXPAND&#x0a;ALL" Tag="{StaticResource Icon_Expand}" Command="{Binding ExpandAllCommand}"/>
+                            <Button Style="{StaticResource TacticalRibbonButtonStyle}" Content="COLLAPSE&#x0a;ALL" Tag="{StaticResource Icon_Collapse}" Command="{Binding CollapseAllCommand}"/>
+
+                            <Rectangle Style="{StaticResource TacticalSeparatorStyle}"/>
+
                             <Button Style="{StaticResource TacticalRibbonButtonStyle}" 
                                     Content="IMPORT&#x0a;TESTS" 
                                     Tag="{StaticResource Icon_Import}" 

@@ -17,8 +17,6 @@ namespace WpfResourceGantt.ProjectManagement.Features.ProjectCreation
         public string SubProjectHeader { get; }
         public string SubProjectName { get; set; }
 
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
         public double Work { get; set; }
 
         public string Description { get; set; }
@@ -58,8 +56,6 @@ namespace WpfResourceGantt.ProjectManagement.Features.ProjectCreation
                 SubProjectName = subProjectToEdit.Name.Substring(firstSpace + 1);
             }
             else { SubProjectName = subProjectToEdit.Name; }
-            StartDate = subProjectToEdit.StartDate;
-            EndDate = subProjectToEdit.EndDate;
             Work = subProjectToEdit.Work;
 
             Tasks = new ObservableCollection<CreateTaskViewModel>(
